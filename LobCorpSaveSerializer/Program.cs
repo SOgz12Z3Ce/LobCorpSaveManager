@@ -11,6 +11,7 @@ namespace LobCorp
 			FileStream fileStream = File.Open(args[0], FileMode.Open);
 			LobCorpSave lobCorpSave = LobCorpSaveSerializer.Deserialize(fileStream);
 			Console.WriteLine(lobCorpSave.ToJson());
+			fileStream.Close();
 		}
 	}
 }
