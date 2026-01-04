@@ -12,7 +12,11 @@ namespace LobCorp.Save
 		}
 		public string ToJson()
 		{
-			return JsonConvert.SerializeObject(this.save);
+			return JsonConvert.SerializeObject(save);
+		}
+		public string ToJson(Formatting formatting)
+		{
+			return JsonConvert.SerializeObject(save, formatting);
 		}
 	}
 }

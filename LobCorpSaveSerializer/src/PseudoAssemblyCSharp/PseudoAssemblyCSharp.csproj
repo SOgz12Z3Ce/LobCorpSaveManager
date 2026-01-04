@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LangVersion>3</LangVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <OutputPath>..\..\out</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="WorkerSprite\WorkerSpriteSaveData.cs" />
+    <Compile Include="InventoryModel.cs" />
+    <Compile Include="RwbpType.cs" />
+    <Compile Include="UnitEGOgiftSpace.cs" />
+    <Compile Include="Vector2Serializer.cs" />
+    <Compile Include="WorkerPrimaryStat.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

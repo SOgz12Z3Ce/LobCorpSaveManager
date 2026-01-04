@@ -5,22 +5,22 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Exe</OutputType>
     <AssemblyName>lobcss</AssemblyName>
-    <OutputPath>lib\</OutputPath>
-    <ThirdPartsPath>third_parts\</ThirdPartsPath>
+    <OutputPath>..\..\out</OutputPath>
+    <LibPath>..\..\lib\</LibPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="LobCorpSave.cs" />
-    <Compile Include="LobCorpSaveSerializer.cs" />
+    <Compile Include="LobCorp\Save\LobCorpSave.cs" />
+    <Compile Include="LobCorp\Save\LobCorpSaveSerializer.cs" />
+    <Compile Include="LobCorp\Program.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>$(ThirdPartsPath)Newtonsoft.Json.13.0.4\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(LibPath)Newtonsoft.Json.13.0.4\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <MonoFiles Include="$(ThirdPartsPath)Mono-2.8.1\**\*.*" />
+    <MonoFiles Include="$(LibPath)Mono-2.8.1\**\*.*" />
   </ItemGroup>
 
   <Target Name="CopyMonoFiles" DependsOnTargets="Build">
