@@ -5,7 +5,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Exe</OutputType>
     <AssemblyName>lobcss</AssemblyName>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>lib\</OutputPath>
+    <ThirdPartsPath>third_parts\</ThirdPartsPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,24 +18,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>lib\Newtonsoft.Json.13.0.4\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(ThirdPartsPath)Newtonsoft.Json.13.0.4\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <MonoFile Include="lib\Mono-2.8.1\mono\2.0\mscorlib.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\mono-2.0.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\mono.exe" />
-    <MonoFile Include="lib\Mono-2.8.1\Newtonsoft.Json.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\System.Core.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\System.Data.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\System.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\System.Runtime.Serialization.dll" />
-    <MonoFile Include="lib\Mono-2.8.1\System.Xml.dll" />
+    <MonoFiles Include="$(ThirdPartsPath)Mono-2.8.1\**\*.*" />
   </ItemGroup>
 
   <Target Name="CopyMonoFiles" DependsOnTargets="Build">
     <Copy
-      SourceFiles="@(MonoFile)"
-      DestinationFolder="$(OutputPath)"
-    />
+      SourceFiles="@(MonoFiles)"
+      DestinationFiles="@(MonoFiles->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
