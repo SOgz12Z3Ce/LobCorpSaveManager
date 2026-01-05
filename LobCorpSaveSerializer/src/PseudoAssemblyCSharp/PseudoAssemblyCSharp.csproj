@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <ProjectGuid>{3CE6379A-EFD2-4582-994E-48E1DFCC9F7C}</ProjectGuid>
     <LangVersion>3</LangVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Library</OutputType>

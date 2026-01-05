@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="CopyMonoFiles" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <ProjectGuid>{9F634173-FF90-47FB-81EF-C35037704B89}</ProjectGuid>
     <LangVersion>3</LangVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Exe</OutputType>
@@ -20,6 +21,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(LibPath)Newtonsoft.Json.13.0.4\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <ProjectReference Include="..\PseudoAssemblyCSharp\PseudoAssemblyCSharp.csproj">
+	<Project>{3CE6379A-EFD2-4582-994E-48E1DFCC9F7C}</Project>
+    </ProjectReference>
     <MonoFiles Include="$(LibPath)Mono-2.8.1\**\*.*" />
   </ItemGroup>
 
