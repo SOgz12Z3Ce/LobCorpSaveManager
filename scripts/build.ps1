@@ -6,7 +6,7 @@ $LibDir = "$ReleaseDir/lib"
 $BinDir = "$ReleaseDir/bin"
 $LicensesDir = "licenses"
 
-xbuild $LobCorpSaveSerializerSolution
+xbuild $LobCorpSaveSerializerSolution /p:Configuration=Release
 
 New-Item -ItemType Directory -Force -Path $LibDir, $BinDir | Out-Null
 Copy-Item -Recurse -Force `
