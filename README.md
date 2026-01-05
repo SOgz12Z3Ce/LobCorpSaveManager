@@ -30,7 +30,6 @@ lobcss <filename>
 
 ## Notes
 
-* Some save files cannot be deserialized yet; support is planned.
 * More features are under development.
 
 ## Build from source
