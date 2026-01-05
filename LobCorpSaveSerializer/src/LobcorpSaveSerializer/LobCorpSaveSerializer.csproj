@@ -11,7 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="LobCorp\Save\LobCorpSave.cs" />
+    <Compile Include="LobCorp\Exceptions\BadArguments.cs" />
+    <Compile Include="LobCorp\Exceptions\BadSaveFile.cs" />
+    <Compile Include="LobCorp\Save\LobCorpSaveSegment.cs" />
     <Compile Include="LobCorp\Save\LobCorpSaveSerializer.cs" />
     <Compile Include="LobCorp\Program.cs" />
   </ItemGroup>
