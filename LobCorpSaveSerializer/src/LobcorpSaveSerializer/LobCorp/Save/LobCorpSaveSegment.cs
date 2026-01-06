@@ -1,16 +1,51 @@
+using System;
 using System.Collections.Generic;
 using LobCorp.Exceptions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LobCorp.Save
 {
 	public class LobCorpSaveSegment
 	{
-		private readonly Dictionary<string, object> save;
-		private SaveType? _type;
-		public LobCorpSaveSegment(Dictionary<string, object> save)
+		public readonly Dictionary<string, object> data;
+		private static readonly Dictionary<string, SaveType> inferMap = new Dictionary<string, SaveType>()
 		{
-			this.save = save;
+			{ "bgmVolume", SaveType.Settings },
+			{ "sefirabossTutorialPlayed", SaveType.Etc },
+			{ "playTime", SaveType.Master },
+			{ "observe", SaveType.Global },
+			{ "money", SaveType.Unlimited },
+			{ "genDay", SaveType.WhiteNight },
+		};
+		private static readonly Dictionary<SaveType, IJsonParser> jsonParserMap = new Dictionary<SaveType, IJsonParser>()
+		{
+			{ SaveType.Settings, new SettingsJsonParser() },
+		};
+		private static readonly Dictionary<SaveType, string> defaultBinaryFileNameMap = new Dictionary<SaveType, string>()
+		{
+			{ SaveType.Settings, "Lobotomy170808state.dat" },
+		};
+		private SaveType? _type;
+		private string _defaultBinaryFileName;
+		public LobCorpSaveSegment(Dictionary<string, object> data)
+		{
+			this.data = data;
+		}
+		public LobCorpSaveSegment(JObject json)
+		{
+			foreach (var kvp in jsonParserMap)
+			{
+				if (kvp.Value.TryParse(json, out data))
+				{
+					_type = kvp.Key; 
+					return;
+				}
+			}
+			throw new BadSaveFile("Unable to parser json.");
+		}
+		public LobCorpSaveSegment(string json) : this(JToken.Parse(json) as JObject)
+		{
 		}
 		public enum SaveType
 		{
@@ -21,52 +56,83 @@ namespace LobCorp.Save
 			Unlimited,
 			WhiteNight,
 		}
+		private interface IJsonParser
+		{
+			bool TryParse(JObject save, out Dictionary<string, object> data);
+		}
 		public SaveType Type
 		{
 			get
 			{
 				if (_type == null)
 				{
-					_type = InferType(save);
+					_type = InferType(data);
 				}
 				return _type.Value;
 			}
 		}
-		private static SaveType InferType(Dictionary<string, object> save)
+		public string DefaultBinaryFileName
 		{
-			if (save.ContainsKey("bgmVolume"))
+			get
 			{
-				return SaveType.Settings;
+				if (_defaultBinaryFileName == null)
+				{
+					_defaultBinaryFileName = DefaultBinaryFileNameOf(Type);
+				}
+				return _defaultBinaryFileName;
 			}
-			if (save.ContainsKey("sefirabossTutorialPlayed"))
-			{
-				return SaveType.Etc;
-			}
-			if (save.ContainsKey("playTime"))
-			{
-				return SaveType.Master;
-			}
-			if (save.ContainsKey("observe"))
-			{
-				return SaveType.Global;
-			}
-			if (save.ContainsKey("money"))
-			{
-				return SaveType.Unlimited;
-			}
-			if (save.ContainsKey("genDay"))
-			{
-				return SaveType.WhiteNight;
-			}
-			throw new BadSaveFile(string.Format("Unable to infer save type."));
+		}
+		public static string DefaultBinaryFileNameOf(SaveType type)
+		{
+			return defaultBinaryFileNameMap[type];
 		}
 		public string ToJson()
 		{
-			return JsonConvert.SerializeObject(save);
+			return JsonConvert.SerializeObject(data);
 		}
 		public string ToJson(Formatting formatting)
 		{
-			return JsonConvert.SerializeObject(save, formatting);
+			return JsonConvert.SerializeObject(data, formatting);
+		}
+		private static SaveType InferType(Dictionary<string, object> save)
+		{
+			return InferType(save.ContainsKey);
+		}
+		private static SaveType InferType(JObject save)
+		{
+			return InferType(save.ContainsKey);
+		}
+		private static SaveType InferType(Func<string, bool> ContainsKey)
+		{
+			foreach (var kvp in inferMap)
+			{
+				if (ContainsKey(kvp.Key))
+				{
+					return kvp.Value;
+				}
+			}
+			throw new BadSaveFile("Unable to infer save type.");
+		}
+		private class SettingsJsonParser : IJsonParser
+		{
+			public bool TryParse(JObject save, out Dictionary<string, object> data)
+			{
+				if (InferType(save) != SaveType.Settings)
+				{
+					data = null;
+					return false;
+				}
+				Dictionary<string, object> result = new Dictionary<string, object>();
+
+				result["bgmVolume"] = save["bgmVolume"].Value<float>();
+				result["masterVolume"] = save["masterVolume"].Value<float>();
+				result["tooltip"] = save["tooltip"].Value<bool>();
+				result["language"] = save["language"].Value<string>();
+				result["logIndex"] = save["logIndex"].Value<int>();
+
+				data = result;
+				return true;
+			}
 		}
 	}
 }

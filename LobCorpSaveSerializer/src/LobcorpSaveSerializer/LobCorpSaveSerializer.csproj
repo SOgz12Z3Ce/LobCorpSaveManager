@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Compile Include="LobCorp\Exceptions\BadArguments.cs" />
+    <Compile Include="LobCorp\Exceptions\BadDataPath.cs" />
     <Compile Include="LobCorp\Exceptions\BadSaveFile.cs" />
     <Compile Include="LobCorp\Save\LobCorpSaveSegment.cs" />
     <Compile Include="LobCorp\Save\LobCorpSaveSerializer.cs" />
