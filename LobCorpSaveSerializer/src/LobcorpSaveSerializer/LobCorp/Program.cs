@@ -66,7 +66,7 @@ namespace LobCorp
 						{
 							Fail(string.Format("Output file {0} already exist.", save.DefaultBinaryFileName));
 						}
-						JsonSaveSerializer.Serialize(save.DefaultBinaryFileName, save);
+						BinarySaveSerializer.Serialize(save.DefaultBinaryFileName, save);
 						break;
 					}
 			}
