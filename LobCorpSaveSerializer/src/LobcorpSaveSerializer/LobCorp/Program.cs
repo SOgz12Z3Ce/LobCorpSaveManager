@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Mail;
 using LobCorp.Exceptions;
 using LobCorp.Save;
+using LobCorp.Save.Serializers;
 
 namespace LobCorp
 {
@@ -44,17 +44,14 @@ namespace LobCorp
 						{
 							Fail("No file specified.");
 						}
-						using (FileStream stream = File.Open(parameter.FilePath, FileMode.Open))
+						SaveFile save = BinarySaveSerializer.Deserialize(parameter.FilePath);
+						if (parameter.HasOption(Parameter.Option.Format))
 						{
-							LobCorpSaveSegment save = LobCorpSaveSerializer.Deserialize(stream, LobCorpSaveSerializer.FileType.Binary);
-							if (parameter.HasOption(Parameter.Option.Format))
-							{
-								Console.WriteLine(save.ToJson(Newtonsoft.Json.Formatting.Indented));
-							}
-							else
-							{
-								Console.WriteLine(save.ToJson());
-							}
+							Console.WriteLine(save.ToJson(Newtonsoft.Json.Formatting.Indented));
+						}
+						else
+						{
+							Console.WriteLine(save.ToJson());
 						}
 						break;
 					}
@@ -64,20 +61,12 @@ namespace LobCorp
 						{
 							Fail("No file specified.");
 						}
-						LobCorpSaveSegment save;
-						using (FileStream stream = File.Open(parameter.FilePath, FileMode.Open))
-						{
-							save = LobCorpSaveSerializer.Deserialize(stream, LobCorpSaveSerializer.FileType.Json);
-						}
+						SaveFile save = JsonSaveSerializer.Deserialize(parameter.FilePath);
 						if (File.Exists(save.DefaultBinaryFileName))
 						{
 							Fail(string.Format("Output file {0} already exist.", save.DefaultBinaryFileName));
 						}
-						using (FileStream stream = File.Open(save.DefaultBinaryFileName, FileMode.CreateNew))
-						{
-
-							LobCorpSaveSerializer.Serialize(stream, save);
-						}
+						JsonSaveSerializer.Serialize(save.DefaultBinaryFileName, save);
 						break;
 					}
 			}

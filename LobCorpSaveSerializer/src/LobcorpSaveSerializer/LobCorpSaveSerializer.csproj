@@ -11,12 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="LobCorp\Exceptions\BadArguments.cs" />
-    <Compile Include="LobCorp\Exceptions\BadDataPath.cs" />
-    <Compile Include="LobCorp\Exceptions\BadSaveFile.cs" />
-    <Compile Include="LobCorp\Save\LobCorpSaveSegment.cs" />
-    <Compile Include="LobCorp\Save\LobCorpSaveSerializer.cs" />
-    <Compile Include="LobCorp\Program.cs" />
+    <Compile Include="LobCorp\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,7 +20,7 @@
       <HintPath>$(LibPath)Newtonsoft.Json.13.0.4\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\PseudoAssemblyCSharp\PseudoAssemblyCSharp.csproj">
-	<Project>{3CE6379A-EFD2-4582-994E-48E1DFCC9F7C}</Project>
+      <Project>{3CE6379A-EFD2-4582-994E-48E1DFCC9F7C}</Project>
     </ProjectReference>
     <MonoFiles Include="$(LibPath)Mono-2.8.1\**\*.*" />
   </ItemGroup>
