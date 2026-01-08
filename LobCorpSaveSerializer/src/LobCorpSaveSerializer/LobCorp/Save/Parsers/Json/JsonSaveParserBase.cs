@@ -35,12 +35,11 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			return SaveTypeInferer.Infer(save) == type;
 		}
-		protected abstract Dictionary<string, object> Parse(JObject save);
-		protected void Copy<T>(Dictionary<string, object> dest, JObject src, string prop)
+		protected static void Copy<T>(Dictionary<string, object> dest, JObject src, string prop)
 		{
 			dest[prop] = src[prop].Value<T>();
 		}
-		protected bool TryCopy<T>(Dictionary<string, object> dest, JObject src, string prop)
+		protected static bool TryCopy<T>(Dictionary<string, object> dest, JObject src, string prop)
 		{
 			JToken value;
 			if (!src.TryGetValue(prop, out value))
@@ -50,9 +49,10 @@ namespace LobCorp.Save.Parsers.Json
 			dest[prop] = value.Value<T>();
 			return true;
 		}
-		protected void CopyList<T>(Dictionary<string, object> dest, JObject src, string prop)
+		protected static void CopyList<T>(Dictionary<string, object> dest, JObject src, string prop)
 		{
 			dest[prop] = src[prop].Values<T>().ToList();
 		}
+		protected abstract Dictionary<string, object> Parse(JObject save);
 	}
 }

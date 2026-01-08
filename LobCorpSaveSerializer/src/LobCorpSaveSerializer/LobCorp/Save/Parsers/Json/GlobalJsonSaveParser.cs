@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using LobCorp.Save.Type;
 using Newtonsoft.Json.Linq;
 
@@ -40,7 +38,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseCodex(JObject observe)
+		private static Dictionary<string, object> ParseCodex(JObject observe)
 		{
 			var inner = new Dictionary<long, Dictionary<string, object>>();
 			var result = new Dictionary<string, object>()
@@ -55,7 +53,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseCodexEntry(JObject entry)
+		private static Dictionary<string, object> ParseCodexEntry(JObject entry)
 		{
 			var result = new Dictionary<string, object>();
 
@@ -70,7 +68,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseTracker(JObject etcData)
+		private static Dictionary<string, object> ParseTracker(JObject etcData)
 		{
 			var result = new Dictionary<string, object>();
 
@@ -86,7 +84,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseEgo(JObject inventory)
+		private static Dictionary<string, object> ParseEgo(JObject inventory)
 		{
 			var result = new Dictionary<string, object>();
 
@@ -95,7 +93,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private List<InventoryModel.EquipmentSaveData> ParseEgoList(JArray equips)
+		private static List<InventoryModel.EquipmentSaveData> ParseEgoList(JArray equips)
 		{
 			var result = new List<InventoryModel.EquipmentSaveData>();
 
@@ -110,7 +108,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseResearch(JObject research)
+		private static Dictionary<string, object> ParseResearch(JObject research)
 		{
 			var inner = new List<Dictionary<string, object>>();
 			var result = new Dictionary<string, object>()
@@ -125,7 +123,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseResearchEntry(JObject entry)
+		private static Dictionary<string, object> ParseResearchEntry(JObject entry)
 		{
 			var result = new Dictionary<string, object>();
 
@@ -134,7 +132,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseMission(JObject missons)
+		private static Dictionary<string, object> ParseMission(JObject missons)
 		{
 			var result = new Dictionary<string, object>();
 
@@ -157,7 +155,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseMissionEntry(JObject entry)
+		private static Dictionary<string, object> ParseMissionEntry(JObject entry)
 		{
 			var result = new Dictionary<string, object>();
 
@@ -165,7 +163,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseSephirah(JObject sefiraCharactes)
+		private static Dictionary<string, object> ParseSephirah(JObject sefiraCharactes)
 		{
 			var inner = new Dictionary<string, object>();
 			var result = new Dictionary<string, object>()
@@ -180,7 +178,7 @@ namespace LobCorp.Save.Parsers.Json
 
 			return result;
 		}
-		private Dictionary<string, object> ParseSephirahEntry(JObject entry)
+		private static Dictionary<string, object> ParseSephirahEntry(JObject entry)
 		{
 			var result = new Dictionary<string, object>();
 
