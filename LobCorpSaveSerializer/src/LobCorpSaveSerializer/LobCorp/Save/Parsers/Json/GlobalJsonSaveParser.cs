@@ -57,13 +57,13 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<int>(result, entry, "observeProgress");
-			Copy<int>(result, entry, "cubeNum");
-			Copy<int>(result, entry, "totalKitUseCount");
-			Copy<float>(result, entry, "totalKitUseTime");
+			result.CopyValue<int>(entry, "observeProgress");
+			result.CopyValue<int>(entry, "cubeNum");
+			result.CopyValue<int>(entry, "totalKitUseCount");
+			result.CopyValue<float>(entry, "totalKitUseTime");
 			foreach (var region in regions)
 			{
-				TryCopy<bool>(result, entry, region);
+				result.TryCopyValue<bool>(entry, region);
 			}
 
 			return result;
@@ -72,15 +72,15 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<int>(result, etcData, "day1clearCount");
-			Copy<bool>(result, etcData, "tutorialDone");
-			Copy<long>(result, etcData, "nextUnitInstanceId");
-			Copy<int>(result, etcData, "unlockedMaxDay");
-			Copy<bool>(result, etcData, "ending1Done");
-			Copy<bool>(result, etcData, "ending2Done");
-			Copy<bool>(result, etcData, "ending3Done");
-			Copy<bool>(result, etcData, "trueEndingDone");
-			Copy<bool>(result, etcData, "hiddenEndingDone");
+			result.CopyValue<int>(etcData, "day1clearCount");
+			result.CopyValue<bool>(etcData, "tutorialDone");
+			result.CopyValue<long>(etcData, "nextUnitInstanceId");
+			result.CopyValue<int>(etcData, "unlockedMaxDay");
+			result.CopyValue<bool>(etcData, "ending1Done");
+			result.CopyValue<bool>(etcData, "ending2Done");
+			result.CopyValue<bool>(etcData, "ending3Done");
+			result.CopyValue<bool>(etcData, "trueEndingDone");
+			result.CopyValue<bool>(etcData, "hiddenEndingDone");
 
 			return result;
 		}
@@ -89,7 +89,7 @@ namespace LobCorp.Save.Parsers.Json
 			var result = new Dictionary<string, object>();
 
 			result["equips"] = ParseEgoList(inventory["equips"] as JArray);
-			Copy<long>(result, inventory, "nextInstanceId");
+			result.CopyValue<long>(inventory, "nextInstanceId");
 
 			return result;
 		}
@@ -127,8 +127,8 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<int>(result, entry, "researchItemTypeId");
-			Copy<int>(result, entry, "curLevel");
+			result.CopyValue<int>(entry, "researchItemTypeId");
+			result.CopyValue<int>(entry, "curLevel");
 
 			return result;
 		}
@@ -136,7 +136,7 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<string>(result, missons, "ver");
+			result.CopyValue<string>(missons, "ver");
 			var inProgress = new List<Dictionary<string, object>>();
 			var cleared = new List<Dictionary<string, object>>();
 			var closed = new List<Dictionary<string, object>>();
@@ -159,7 +159,7 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<int>(result, entry, "metadataId");
+			result.CopyValue<int>(entry, "metadataId");
 
 			return result;
 		}
@@ -182,7 +182,7 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<int>(result, entry, "level");
+			result.CopyValue<int>(entry, "level");
 
 			return result;
 		}

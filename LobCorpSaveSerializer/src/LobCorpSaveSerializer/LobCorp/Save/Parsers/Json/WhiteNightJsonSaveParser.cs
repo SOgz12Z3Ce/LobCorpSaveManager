@@ -13,8 +13,8 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var data = new Dictionary<string, object>();
 
-			Copy<int>(data, save, "genDay");
-			Copy<int>(data, save, "apostleListCount");
+			data.CopyValue<int>(save, "genDay");
+			data.CopyValue<int>(save, "apostleListCount");
 			data["apostleList"] = ParseApostles(save["apostleList"] as JObject);
 			
 			return data;
@@ -32,11 +32,11 @@ namespace LobCorp.Save.Parsers.Json
 		{
 			var result = new Dictionary<string, object>();
 
-			Copy<int>(result, apostleListItem, "NameId");
+			result.CopyValue<int>(apostleListItem, "NameId");
 			result["hairData"] = JsonSaveParserUtils.ParseHairStyle(apostleListItem["hairData"] as JObject);
 			result["HairColor"] = JsonSaveParserUtils.ParseHairColor(apostleListItem["HairColor"] as JObject);
-			Copy<long>(result, apostleListItem, "isntId");
-			Copy<string>(result, apostleListItem, "Name");
+			result.CopyValue<long>(apostleListItem, "isntId");
+			result.CopyValue<string>(apostleListItem, "Name");
 
 			return result;
 		}

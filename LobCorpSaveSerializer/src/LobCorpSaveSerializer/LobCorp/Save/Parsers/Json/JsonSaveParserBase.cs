@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using LobCorp.Save.Type;
 using Newtonsoft.Json.Linq;
 
@@ -34,24 +33,6 @@ namespace LobCorp.Save.Parsers.Json
 		protected bool CanParse(JObject save)
 		{
 			return SaveTypeInferer.Infer(save) == type;
-		}
-		protected static void Copy<T>(Dictionary<string, object> dest, JObject src, string prop)
-		{
-			dest[prop] = src[prop].Value<T>();
-		}
-		protected static bool TryCopy<T>(Dictionary<string, object> dest, JObject src, string prop)
-		{
-			JToken value;
-			if (!src.TryGetValue(prop, out value))
-			{
-				return false;
-			}
-			dest[prop] = value.Value<T>();
-			return true;
-		}
-		protected static void CopyList<T>(Dictionary<string, object> dest, JObject src, string prop)
-		{
-			dest[prop] = src[prop].Values<T>().ToList();
 		}
 		protected abstract Dictionary<string, object> Parse(JObject save);
 	}
