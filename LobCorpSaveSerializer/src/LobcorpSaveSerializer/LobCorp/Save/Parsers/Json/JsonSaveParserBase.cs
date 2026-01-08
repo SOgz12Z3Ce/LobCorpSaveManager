@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using LobCorp.Save.Type;
@@ -19,7 +20,15 @@ namespace LobCorp.Save.Parsers.Json
 				data = null;
 				return false;
 			}
-			data = Parse(save);
+			try
+			{
+				data = Parse(save);
+			}
+			catch (NotImplementedException)
+			{
+				data = null;
+				return false;
+			}
 			return true;
 		}
 		protected bool CanParse(JObject save)
@@ -27,13 +36,23 @@ namespace LobCorp.Save.Parsers.Json
 			return SaveTypeInferer.Infer(save) == type;
 		}
 		protected abstract Dictionary<string, object> Parse(JObject save);
-		protected void Copy<T>(Dictionary<string, object> dest, JObject src, string attr)
+		protected void Copy<T>(Dictionary<string, object> dest, JObject src, string prop)
 		{
-			dest[attr] = src[attr].Value<T>();
+			dest[prop] = src[prop].Value<T>();
 		}
-		protected void CopyList<T>(Dictionary<string, object> dest, JObject src, string attr)
+		protected bool TryCopy<T>(Dictionary<string, object> dest, JObject src, string prop)
 		{
-			dest[attr] = src[attr].Values<T>().ToList();
+			JToken value;
+			if (!src.TryGetValue(prop, out value))
+			{
+				return false;
+			}
+			dest[prop] = value.Value<T>();
+			return true;
+		}
+		protected void CopyList<T>(Dictionary<string, object> dest, JObject src, string prop)
+		{
+			dest[prop] = src[prop].Values<T>().ToList();
 		}
 	}
 }

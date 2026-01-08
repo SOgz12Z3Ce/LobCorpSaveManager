@@ -5,9 +5,9 @@ using Newtonsoft.Json.Linq;
 
 namespace LobCorp.Save.Parsers.Json
 {
-	public class GlobalJsonSaveParser : JsonSaveParserBase
+	public class MasterJsonSaveParser : JsonSaveParserBase
 	{
-		public GlobalJsonSaveParser() : base(SaveType.Global)
+		public MasterJsonSaveParser() : base(SaveType.Master)
 		{
 		}
 		protected override Dictionary<string, object> Parse(JObject save)
