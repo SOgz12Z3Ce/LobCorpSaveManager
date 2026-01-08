@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LobcorpSaveSerializer", "LobcorpSaveSerializer", "{C0390A93-60AD-3053-957F-8A926859368A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lobCorpSaveSerializer", "lobCorpSaveSerializer", "{C0390A93-60AD-3053-957F-8A926859368A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LobCorpSaveSerializer", "src\LobcorpSaveSerializer\LobCorpSaveSerializer.csproj", "{9F634173-FF90-47FB-81EF-C35037704B89}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LobCorpSaveSerializer", "src\lobCorpSaveSerializer\LobCorpSaveSerializer.csproj", "{9F634173-FF90-47FB-81EF-C35037704B89}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PseudoAssemblyCSharp", "src\PseudoAssemblyCSharp\PseudoAssemblyCSharp.csproj", "{3CE6379A-EFD2-4582-994E-48E1DFCC9F7C}"
 EndProject
