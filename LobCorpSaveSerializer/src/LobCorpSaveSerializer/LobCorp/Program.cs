@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Permissions;
 using LobCorp.Exceptions;
 using LobCorp.Save;
 using LobCorp.Save.Serializers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Schema;
 
 namespace LobCorp
 {
@@ -44,14 +47,45 @@ namespace LobCorp
 						{
 							Fail("No file specified.");
 						}
-						SaveFile save = BinarySaveSerializer.Deserialize(parameter.FilePath);
-						if (parameter.HasOption(Parameter.Option.Format))
+						SaveFile save = null;
+						try
 						{
-							Console.WriteLine(save.ToJson(Newtonsoft.Json.Formatting.Indented));
+							save = BinarySaveSerializer.Deserialize(parameter.FilePath);
+						}
+						catch (FileNotFoundException)
+						{
+							Fail(string.Format("File dosen't exist: {0}", parameter.FilePath));
+						}
+						catch (Exception)
+						{
+							Fail(string.Format("Unable to deserialze file: {0}", parameter.FilePath));
+						}
+
+						if (parameter.HasOption(Parameter.Option.SaveToFile))
+						{
+							if (File.Exists(save.DefaultJsonFileName))
+							{
+								Fail(string.Format("Output file {0} already exist.", save.DefaultJsonFileName));
+							}
+							if (parameter.HasOption(Parameter.Option.Format))
+							{
+								JsonSaveSerializer.Serialize(save.DefaultJsonFileName, save, Formatting.Indented);
+							}
+							else
+							{
+								JsonSaveSerializer.Serialize(save.DefaultJsonFileName, save);
+							}
 						}
 						else
 						{
-							Console.WriteLine(save.ToJson());
+							if (parameter.HasOption(Parameter.Option.Format))
+							{
+								Console.WriteLine(save.ToJson(Formatting.Indented));
+							}
+							else
+							{
+								Console.WriteLine(save.ToJson());
+							}
 						}
 						break;
 					}
@@ -61,11 +95,24 @@ namespace LobCorp
 						{
 							Fail("No file specified.");
 						}
-						SaveFile save = JsonSaveSerializer.Deserialize(parameter.FilePath);
+						SaveFile save = null;
+						try
+						{
+							save = JsonSaveSerializer.Deserialize(parameter.FilePath);
+						}
+						catch (FileNotFoundException)
+						{
+							Fail(string.Format("File dosen't exist: {0}", parameter.FilePath));
+						}
+						catch (Exception)
+						{
+							Fail(string.Format("Unable to deserialze file: {0}", parameter.FilePath));
+						}
 						if (File.Exists(save.DefaultBinaryFileName))
 						{
 							Fail(string.Format("Output file {0} already exist.", save.DefaultBinaryFileName));
 						}
+
 						BinarySaveSerializer.Serialize(save.DefaultBinaryFileName, save);
 						break;
 					}
@@ -86,6 +133,8 @@ namespace LobCorp
 			{
 				{ "-f", Option.Format},
 				{ "--format", Option.Format},
+				{ "-s", Option.SaveToFile},
+				{ "--save-to-file", Option.SaveToFile},
 			};
 			private static readonly Dictionary<string, Command> commandMap = new Dictionary<string, Command>()
 			{
@@ -145,6 +194,7 @@ namespace LobCorp
 			public enum Option
 			{
 				Format,
+				SaveToFile,
 			}
 			public enum Command
 			{

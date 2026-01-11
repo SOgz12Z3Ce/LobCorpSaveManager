@@ -13,6 +13,7 @@ namespace LobCorp.Save
 		public readonly Dictionary<string, object> data;
 		private SaveType? _type;
 		private string _defaultBinaryFileName;
+		private string _defaultJsonFileName;
 		public SaveFile(Dictionary<string, object> data)
 		{
 			this.data = data;
@@ -52,6 +53,17 @@ namespace LobCorp.Save
 					_defaultBinaryFileName = BinarySaveSerializer.DefaultFileNameOf(Type);
 				}
 				return _defaultBinaryFileName;
+			}
+		}
+		public string DefaultJsonFileName
+		{
+			get
+			{
+				if (_defaultJsonFileName == null)
+				{
+					_defaultJsonFileName = JsonSaveSerializer.DefaultFileNameOf(Type);
+				}
+				return _defaultJsonFileName;
 			}
 		}
 		public string ToJson()
