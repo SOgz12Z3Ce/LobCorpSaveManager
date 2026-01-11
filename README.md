@@ -25,7 +25,19 @@ Due to the current build system, only Windows is supported for now. Support for 
 To deserialize a save file into JSON:
 
 ```bash
-lobcss <filename>
+lobcss decode savefile.dat -f -s
+```
+
+or use `>`:
+
+```bash
+lobcss encode savefile.dat -f > savefile.json
+```
+
+To serialize a JSON into save file:
+
+```bash
+lobcss encode savefile.json
 ```
 
 ## Notes
@@ -44,6 +56,7 @@ cd LobCorpSaveManager
 ### Windows
 
 1. Install a Mono version capable of building and running .NET Framework 3.5 programs. One available option is **Mono 2.8.1** from the official archive: [https://download.mono-project.com/archive/2.8.1/windows-installer/3/mono-2.8.1-gtksharp-2.12.10-win32-3.exe](https://download.mono-project.com/archive/2.8.1/windows-installer/3/mono-2.8.1-gtksharp-2.12.10-win32-3.exe)
+
 2. Add Mono’s `bin` directory to your `PATH`. For example (Mono 2.8.1):
 
 ```
