@@ -28,7 +28,7 @@ namespace LobCorp.Save.Parsers.Json
 		public static Dictionary<string, object> ParseDay(JObject day)
 		{
 			var result = new Dictionary<string, object>();
-			result.CopyValue<string>(day, "saveVer");
+			result.CopyValue<string>(day, "saveInnerVer");
 			result.CopyValue<int>(day, "day");
 			result["money"] = ParseLobPoint(day["money"] as JObject);
 			result["agents"] = ParseAgent(day["agents"] as JObject);
@@ -75,7 +75,7 @@ namespace LobCorp.Save.Parsers.Json
 			result.CopyValue<int>(entry, "uniqueScriptIndex");
 			result["spriteSet"] = ParseAgentEntrySprite(entry["spriteSet"] as JObject);
 			result["primaryStat"] = ParseAgentEntryVirtue(entry["primaryStat"] as JObject);
-			result.CopyValue<int>(entry, "perfix");
+			result.CopyValue<int>(entry, "prefix");
 			result.CopyValue<int>(entry, "suffix");
 			result.CopyValue<long>(entry, "weaponId");
 			result.CopyValue<long>(entry, "armorId");
@@ -106,15 +106,26 @@ namespace LobCorp.Save.Parsers.Json
 			result["workCubeCounts"] = ParseAgentEntryStatisticWorkCount(history["workCubeCounts"] as JObject);
 			return result;
 		}
-		private static Dictionary<RwbpType, object> ParseAgentEntryStatisticWorkCount(JObject workCubeCounts)
+		private static Dictionary<RwbpType, int> ParseAgentEntryStatisticWorkCount(JObject workCubeCounts)
 		{
-			return new Dictionary<RwbpType, object>()
+			var result = new Dictionary<RwbpType, int>();
+			if (workCubeCounts.ContainsKey("R"))
 			{
-				{ RwbpType.R, workCubeCounts["R"].Value<int>() },
-				{ RwbpType.W, workCubeCounts["W"].Value<int>() },
-				{ RwbpType.B, workCubeCounts["B"].Value<int>() },
-				{ RwbpType.P, workCubeCounts["P"].Value<int>() },
-			};
+				result[RwbpType.R] = workCubeCounts["R"].Value<int>();
+			}
+			if (workCubeCounts.ContainsKey("W"))
+			{
+				result[RwbpType.W] = workCubeCounts["W"].Value<int>();
+			}
+			if (workCubeCounts.ContainsKey("B"))
+			{
+				result[RwbpType.B] = workCubeCounts["B"].Value<int>();
+			}
+			if (workCubeCounts.ContainsKey("P"))
+			{
+				result[RwbpType.P] = workCubeCounts["P"].Value<int>();
+			}
+			return result;
 		}
 		private static Dictionary<string, object> ParseAgentEntrySprite(JObject spriteSet)
 		{
@@ -190,6 +201,7 @@ namespace LobCorp.Save.Parsers.Json
 			{
 				creatureList.Add(ParseAbnormalityEntry(entry as JObject));
 			}
+			result["creatureList"] = creatureList;
 			return result;
 		}
 		private static Dictionary<string, object> ParseAbnormalityEntry(JObject entry)
@@ -201,8 +213,8 @@ namespace LobCorp.Save.Parsers.Json
 			result.CopyValue<string>(entry, "sefiraNum");
 			result["basePosition"] = new Vector2Serializer()
 			{
-				x = entry["x"].Value<float>(),
-				y = entry["y"].Value<float>(),
+				x = entry["basePosition"]["x"].Value<float>(),
+				y = entry["basePosition"]["y"].Value<float>(),
 			};
 			return result;
 		}
