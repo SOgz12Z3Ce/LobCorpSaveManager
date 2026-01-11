@@ -33,7 +33,7 @@ namespace LobCorp.Save.Parsers.Json
 			var result = new Dictionary<string, object>();
 
 			result.CopyValue<int>(apostleListItem, "NameId");
-			result["hairData"] = JsonSaveParserUtils.ParseStyle(apostleListItem["hairData"] as JObject);
+			result["HairData"] = JsonSaveParserUtils.ParseStyle(apostleListItem["HairData"] as JObject);
 			result["HairColor"] = JsonSaveParserUtils.ParseColor(apostleListItem["HairColor"] as JObject);
 			result.CopyValue<long>(apostleListItem, "isntId");
 			result.CopyValue<string>(apostleListItem, "Name");

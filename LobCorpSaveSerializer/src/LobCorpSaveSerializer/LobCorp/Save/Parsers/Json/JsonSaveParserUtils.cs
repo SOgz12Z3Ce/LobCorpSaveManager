@@ -25,27 +25,13 @@ namespace LobCorp.Save.Parsers.Json
 				a = color["a"].Value<float>(),
 			};
 		}
-		public static Dictionary<string, object> ParseDay(JObject day)
-		{
-			var result = new Dictionary<string, object>();
-			result.CopyValue<string>(day, "saveInnerVer");
-			result.CopyValue<int>(day, "day");
-			result["money"] = ParseLobPoint(day["money"] as JObject);
-			result["agents"] = ParseAgent(day["agents"] as JObject);
-			result["creatures"] = ParseAbnormality(day["creatures"] as JObject);
-			result["playerData"] = ParseDate(day["playerData"] as JObject);
-			result["sefiras"] = ParseSefirah(day["sefiras"] as JObject);
-			result.CopyValue<string>(day, "saveState");
-			result["agentName"] = new Dictionary<string, object>();
-			return result;
-		}
-		private static Dictionary<string, object> ParseLobPoint(JObject money)
+		public static Dictionary<string, object> ParseLobPoint(JObject money)
 		{
 			var result = new Dictionary<string, object>();
 			result.CopyValue<int>(money, "money");
 			return result;
 		}
-		private static Dictionary<string, object> ParseAgent(JObject agents)
+		public static Dictionary<string, object> ParseAgent(JObject agents)
 		{
 			var result = new Dictionary<string, object>();
 			result.CopyValue<long>(agents, "nextInstId");
@@ -55,6 +41,18 @@ namespace LobCorp.Save.Parsers.Json
 				agentList.Add(ParseAgentEntry(entry as JObject));
 			}
 			result["agentList"] = agentList;
+			return result;
+		}
+		public static Dictionary<string, object> ParseAbnormality(JObject creatures)
+		{
+			var result = new Dictionary<string, object>();
+			result.CopyValue<long>(creatures, "nextInstId");
+			var creatureList = new List<Dictionary<string, object>>();
+			foreach (var entry in creatures["creatureList"])
+			{
+				creatureList.Add(ParseAbnormalityEntry(entry as JObject));
+			}
+			result["creatureList"] = creatureList;
 			return result;
 		}
 		private static Dictionary<string, object> ParseAgentEntry(JObject entry)
@@ -192,18 +190,6 @@ namespace LobCorp.Save.Parsers.Json
 			}
 			return result;
 		}
-		private static Dictionary<string, object> ParseAbnormality(JObject creatures)
-		{
-			var result = new Dictionary<string, object>();
-			result.CopyValue<long>(creatures, "nextInstId");
-			var creatureList = new List<Dictionary<string, object>>();
-			foreach (var entry in creatures["creatureList"])
-			{
-				creatureList.Add(ParseAbnormalityEntry(entry as JObject));
-			}
-			result["creatureList"] = creatureList;
-			return result;
-		}
 		private static Dictionary<string, object> ParseAbnormalityEntry(JObject entry)
 		{
 			var result = new Dictionary<string, object>();
@@ -216,28 +202,6 @@ namespace LobCorp.Save.Parsers.Json
 				x = entry["basePosition"]["x"].Value<float>(),
 				y = entry["basePosition"]["y"].Value<float>(),
 			};
-			return result;
-		}
-		private static Dictionary<string, object> ParseDate(JObject playerData)
-		{
-			var result = new Dictionary<string, object>();
-			result.CopyValue<int>(playerData, "day");
-			return result;
-		}
-		private static Dictionary<string, object> ParseSefirah(JObject sefiras)
-		{
-			var result = new Dictionary<string, object>();
-			foreach (var entry in sefiras)
-			{
-				result[entry.Key] = ParseSefirahEntry(entry.Value as JObject);
-			}
-			return result;
-		}
-		private static Dictionary<string, object> ParseSefirahEntry(JObject entry)
-		{
-			var result = new Dictionary<string, object>();
-			result.CopyValue<bool>(entry, "activated");
-			result.CopyValue<int>(entry, "openLevel");
 			return result;
 		}
 	}

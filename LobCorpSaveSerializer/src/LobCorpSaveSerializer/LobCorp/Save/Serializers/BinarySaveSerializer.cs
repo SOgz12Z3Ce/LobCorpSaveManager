@@ -15,6 +15,7 @@ namespace LobCorp.Save.Serializers
 			{ SaveType.Etc, "etc170808.dat" },
 			{ SaveType.Master, "saveData170808.dat" },
 			{ SaveType.Global, "saveGlobal170808.dat" },
+			{ SaveType.Unlimited, "saveUnlimitV5170808.dat" },
 			{ SaveType.WhiteNight, "100014.dat" },
 		};
 		public static void Serialize(string path, SaveFile save)

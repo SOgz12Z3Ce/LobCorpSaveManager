@@ -12,7 +12,12 @@ namespace LobCorp.Save.Parsers.Json
 		}
 		protected override Dictionary<string, object> Parse(JObject save)
 		{
-			throw new NotImplementedException();
+			var result = new Dictionary<string, object>();
+			result.CopyValue<string>(save, "saveVer");
+			result["money"] = JsonSaveParserUtils.ParseLobPoint(save["money"] as JObject);
+			result["agents"] = JsonSaveParserUtils.ParseAgent(save["agents"] as JObject);
+			result["creatures"] = JsonSaveParserUtils.ParseAbnormality(save["creatures"] as JObject);
+			return result;
 		}
 	}
 }
