@@ -137,21 +137,27 @@ namespace LobCorp.Save.Parsers.Json
 			var result = new Dictionary<string, object>();
 
 			result.CopyValue<string>(missons, "ver");
+
 			var inProgress = new List<Dictionary<string, object>>();
-			var cleared = new List<Dictionary<string, object>>();
-			var closed = new List<Dictionary<string, object>>();
 			foreach (var entry in missons["missionsInProgress"])
 			{
 				inProgress.Add(ParseMissionEntry(entry as JObject));
 			}
+			result["missionsInProgress"] = inProgress;
+
+			var cleared = new List<Dictionary<string, object>>();
 			foreach (var entry in missons["clearedMissions"])
 			{
 				cleared.Add(ParseMissionEntry(entry as JObject));
 			}
+			result["clearedMissions"] = cleared;
+
+			var closed = new List<Dictionary<string, object>>();
 			foreach (var entry in missons["closedMissions"])
 			{
 				closed.Add(ParseMissionEntry(entry as JObject));
 			}
+			result["closedMissions"] = closed;
 
 			return result;
 		}
