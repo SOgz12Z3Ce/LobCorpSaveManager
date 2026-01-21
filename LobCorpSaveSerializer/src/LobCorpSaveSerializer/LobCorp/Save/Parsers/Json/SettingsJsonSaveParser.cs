@@ -13,7 +13,6 @@ namespace LobCorp.Save.Parsers.Json
 			var data = new Dictionary<string, object>();
 
 			data.CopyValue<float>(save, "bgmVolume");
-			data.CopyValue<float>(save, "bgmVolume");
 			data.CopyValue<float>(save, "masterVolume");
 			data.CopyValue<bool>(save, "tooltip");
 			data.CopyValue<string>(save, "language");
