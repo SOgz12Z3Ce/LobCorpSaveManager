@@ -5,6 +5,8 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
+use crate::save::RawSave;
+
 #[derive(Debug)]
 pub enum Error {
     BadJsonString(serde_json::Error),
@@ -21,9 +23,7 @@ impl Display for Error {
             Error::InvalidFactorValue(v) => write!(f, "{} is not in [0, 1].", v)?,
             Error::InvalidIndexCycleValue(v) => write!(f, "{} is not in [0, 10).", v)?,
             Error::InvalidLanguage(s) => write!(f, "{} is not a vaild language.", s)?,
-            Error::NotSupportedLanguage(s) => {
-                write!(f, "{} dosen't be suppored in regular game.", s)?
-            }
+            Error::NotSupportedLanguage(s) => write!(f, "{} is not suppored in regular game.", s)?,
         }
         Ok(())
     }
@@ -51,12 +51,12 @@ pub struct SettingsSave {
 impl SettingsSave {
     pub fn from_raw(raw: SettingsRawSave) -> Result<Self, Error> {
         Ok(Self {
-            master_volume: Factor::new(raw.master_volume)?,
-            bgm_volume: Factor::new(raw.bgm_volume)?,
+            master_volume: raw.master_volume.try_into()?,
+            bgm_volume: raw.bgm_volume.try_into()?,
             tooltip_enabled: raw.tooltip_enabled,
             patron_abnormailties_enabled: raw.patron_abnormailties_enabled,
             language: Language::from_str(&raw.language)?,
-            log_index: IndexCycle::new_i32(raw.log_index)?,
+            log_index: raw.log_index.try_into()?,
         })
     }
 }
@@ -64,12 +64,13 @@ impl SettingsSave {
 #[derive(Debug)]
 pub struct Factor(f32);
 
-impl Factor {
-    fn new(f: f32) -> Result<Self, Error> {
-        if f >= 0f32 && f <= 1f32 {
-            Ok(Factor(f))
+impl TryFrom<f32> for Factor {
+    type Error = Error;
+    fn try_from(value: f32) -> Result<Self, Self::Error> {
+        if value >= 0.0 && value <= 1.0 {
+            Ok(Self(value))
         } else {
-            Err(Error::InvalidFactorValue(f))
+            Err(Error::InvalidFactorValue(value))
         }
     }
 }
@@ -77,20 +78,24 @@ impl Factor {
 #[derive(Debug)]
 pub struct IndexCycle(u8);
 
-impl IndexCycle {
-    fn new(i: u8) -> Result<Self, Error> {
-        if i < 10 {
-            Ok(IndexCycle(i))
+impl TryFrom<u8> for IndexCycle {
+    type Error = Error;
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if value < 10 {
+            Ok(Self(value))
         } else {
-            Err(Error::InvalidIndexCycleValue(i as i32))
+            Err(Error::InvalidIndexCycleValue(value.into()))
         }
     }
+}
 
-    fn new_i32(i: i32) -> Result<Self, Error> {
-        match i.try_into().ok() {
-            Some(val) => IndexCycle::new(val),
-            None => Err(Error::InvalidIndexCycleValue(i as i32)),
-        }
+impl TryFrom<i32> for IndexCycle {
+    type Error = Error;
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        let value_u8: u8 = value
+            .try_into()
+            .map_err(|_| Error::InvalidIndexCycleValue(value))?;
+        Self::try_from(value_u8)
     }
 }
 
@@ -154,9 +159,8 @@ pub struct SettingsRawSave {
 impl FromStr for SettingsRawSave {
     type Err = Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match serde_json::from_str(s) {
-            Ok(save) => Ok(save),
-            Err(e) => Err(Error::BadJsonString(e)),
-        }
+        serde_json::from_str(s).map_err(|e| Error::BadJsonString(e))
     }
 }
+
+impl RawSave for SettingsRawSave {}
