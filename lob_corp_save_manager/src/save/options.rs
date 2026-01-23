@@ -1,16 +1,15 @@
 use core::str;
 use std::{
     fmt::{Display, Formatter},
-    fs::File,
     str::FromStr,
 };
 
 use serde::{Deserialize, Serialize};
 
-use crate::save::RawSave;
+use crate::save::{RawSave, Save};
 
 #[derive(Debug)]
-enum Language {
+pub enum Language {
     English,
     Korean,
     ChineseSimplified,
@@ -25,62 +24,47 @@ enum Language {
 }
 
 #[derive(Debug)]
-struct Toggle(bool);
+pub struct Toggle(bool);
 
 #[derive(Debug)]
-struct Factor(f32);
+pub struct Factor(f32);
 
 #[derive(Debug)]
-struct IndexCycle(u8);
+pub struct IndexCycle(u8);
 
 #[derive(Debug)]
 pub struct OptionsSave {
-    language: Language,
-    tooltips_enabled: Toggle,
-    backer_abnormalities_enabled: Toggle,
-    master_volume: Factor,
-    music_volume: Factor,
-    log_index: IndexCycle,
+    pub language: Language,
+    pub tooltips_enabled: Toggle,
+    pub backer_abnormalities_enabled: Toggle,
+    pub master_volume: Factor,
+    pub music_volume: Factor,
+    pub log_index: IndexCycle,
 }
 
 #[derive(Debug)]
 pub enum Error {
-    BadJsonFile(super::Error),
-    BadJsonString(serde_json::Error),
-    InvalidFactorValue(f32),
-    InvalidIndexCycleValue(i32),
     InvalidLanguage(String),
     UnsupportedLanguage(String),
+    InvalidFactorValue(f32),
+    InvalidIndexCycleValue(i32),
 }
 
-impl OptionsSave {
-    pub fn from_file(file: File) -> Result<Self, Error> {
-        let raw = OptionsRawSave::from_file(file).map_err(Error::BadJsonFile)?;
-        Self::from_raw(raw)
-    }
-    fn set_master_volume(&mut self, value: f32) -> Result<(), Error> {
-        self.master_volume = value.try_into()?;
-        Ok(())
-    }
-    fn set_music_volume(&mut self, value: f32) -> Result<(), Error> {
-        self.music_volume = value.try_into()?;
-        Ok(())
-    }
-    fn set_log_index(&mut self, value: i32) -> Result<(), Error> {
-        self.log_index = value.try_into()?;
-        Ok(())
-    }
-    fn from_raw(raw: OptionsRawSave) -> Result<Self, Error> {
+impl TryFrom<OptionsRawSave> for OptionsSave {
+    type Error = Error;
+    fn try_from(value: OptionsRawSave) -> Result<Self, Self::Error> {
         Ok(Self {
-            language: Language::from_str(&raw.language)?,
-            tooltips_enabled: raw.tooltips_enabled.into(),
-            backer_abnormalities_enabled: raw.backer_abnormalities_enabled.into(),
-            master_volume: raw.master_volume.try_into()?,
-            music_volume: raw.music_volume.try_into()?,
-            log_index: raw.log_index.try_into()?,
+            language: Language::from_str(&value.language)?,
+            tooltips_enabled: value.tooltips_enabled.into(),
+            backer_abnormalities_enabled: value.backer_abnormalities_enabled.into(),
+            master_volume: value.master_volume.try_into()?,
+            music_volume: value.music_volume.try_into()?,
+            log_index: value.log_index.try_into()?,
         })
     }
 }
+
+impl Save<OptionsRawSave> for OptionsSave {}
 
 impl Display for OptionsSave {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -101,6 +85,24 @@ impl Display for OptionsSave {
         writeln!(f, "Debug:")?;
         write!(f, "  Log Index: {}", self.log_index.0)?;
         Ok(())
+    }
+}
+
+impl Language {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Language::English => "en",
+            Language::Korean => "kr",
+            Language::ChineseSimplified => "cn",
+            Language::ChineseTraditional => "cn_tr",
+            Language::Japanese => "jp",
+            Language::Russian => "ru",
+            Language::Bulgarian => "bg",
+            Language::SpanishLatinAmerica => "es",
+            Language::French => "fr",
+            Language::PortugueseBrazil => "pt_br",
+            Language::PortuguesePortugal => "pt_pt",
+        }
     }
 }
 
@@ -197,8 +199,6 @@ impl TryFrom<i32> for IndexCycle {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::BadJsonFile(e) => write!(f, "Cannot deserialize JSON file: {:?}", e)?,
-            Error::BadJsonString(e) => write!(f, "Cannot deserialize JSON string: {:?}", e)?,
             Error::InvalidFactorValue(v) => write!(f, "{} is not in [0, 1].", v)?,
             Error::InvalidIndexCycleValue(v) => write!(f, "{} is not in [0, 10).", v)?,
             Error::InvalidLanguage(s) => write!(f, "{} is not a vaild language.", s)?,
@@ -210,15 +210,12 @@ impl Display for Error {
 
 impl core::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Error::BadJsonString(e) => Some(e),
-            _ => None,
-        }
+        None
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct OptionsRawSave {
+pub struct OptionsRawSave {
     #[serde(rename = "masterVolume")]
     master_volume: f32,
 
@@ -238,11 +235,17 @@ struct OptionsRawSave {
     log_index: i32,
 }
 
-impl FromStr for OptionsRawSave {
-    type Err = Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        serde_json::from_str(s).map_err(|e| Error::BadJsonString(e))
+impl From<OptionsSave> for OptionsRawSave {
+    fn from(value: OptionsSave) -> Self {
+        Self {
+            master_volume: value.master_volume.0,
+            music_volume: value.music_volume.0,
+            tooltips_enabled: value.tooltips_enabled.0,
+            backer_abnormalities_enabled: value.backer_abnormalities_enabled.0,
+            language: value.language.as_str().to_owned(),
+            log_index: value.log_index.0.into(),
+        }
     }
 }
 
-impl RawSave for OptionsRawSave {}
+impl RawSave<OptionsSave> for OptionsRawSave {}

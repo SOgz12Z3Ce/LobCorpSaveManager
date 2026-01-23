@@ -1,18 +1,20 @@
-use std::{fmt::Display, fs::File, io::Read, str::FromStr};
+use std::{fmt::Display, fs::File};
+
+use serde::{Serialize, de::DeserializeOwned};
 
 pub mod options;
 
 #[derive(Debug)]
 pub enum Error {
-    ParseJsonFail(String, Box<dyn std::error::Error>),
-    ReadFileFail(std::io::Error),
+    BadJsonFile(serde_json::Error),
+    BadRawSave(Box<dyn std::error::Error>),
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::ParseJsonFail(json, err) => write!(f, "{:?} from this JSON: {}", err, json)?,
-            Error::ReadFileFail(err) => write!(f, "Cannot read file: {:?}", err)?,
+            Self::BadJsonFile(e) => write!(f, "Cannot deserialize JSON file: {:?}", e)?,
+            Self::BadRawSave(e) => write!(f, "Invaild Save: {:?}", e)?,
         }
         Ok(())
     }
@@ -21,22 +23,29 @@ impl Display for Error {
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Error::ParseJsonFail(_, err) => Some(err.as_ref()),
-            Error::ReadFileFail(err) => Some(err),
+            Self::BadJsonFile(e) => Some(e),
+            Self::BadRawSave(e) => Some(e.as_ref()),
         }
     }
 }
-trait Save {
 
-}
-pub trait RawSave: FromStr
+pub trait Save<R>: TryFrom<R>
 where
-    <Self as FromStr>::Err: std::error::Error + 'static,
+    R: RawSave<Self>,
+    <Self as TryFrom<R>>::Error: 'static + std::error::Error,
 {
-    fn from_file(mut file: File) -> Result<Self, Error> {
-        let mut content = String::new();
-        file.read_to_string(&mut content)
-            .map_err(Error::ReadFileFail)?;
-        Self::from_str(&content).map_err(|e| Error::ParseJsonFail(content, Box::new(e)))
+    fn from_file(file: File) -> Result<Self, Error> {
+        let raw: R = serde_json::from_reader(file).map_err(Error::BadJsonFile)?;
+        raw.try_into().map_err(|e| Error::BadRawSave(Box::new(e)))
     }
+    fn into_json(self) -> Result<String, serde_json::Error> {
+        let raw: R = self.into();
+        serde_json::to_string(&raw)
+    }
+}
+
+pub trait RawSave<S>: From<S> + Serialize + DeserializeOwned
+where
+    S: TryFrom<Self>,
+{
 }
