@@ -11,7 +11,7 @@ namespace LobCorp.Save.Serializers
 	{
 		private static readonly Dictionary<SaveType, string> defaultFileNameMap = new Dictionary<SaveType, string>()
 		{
-			{ SaveType.Settings, "Lobotomy170808state.dat" },
+			{ SaveType.Options, "Lobotomy170808state.dat" },
 			{ SaveType.Etc, "etc170808.dat" },
 			{ SaveType.Master, "saveData170808.dat" },
 			{ SaveType.Global, "saveGlobal170808.dat" },

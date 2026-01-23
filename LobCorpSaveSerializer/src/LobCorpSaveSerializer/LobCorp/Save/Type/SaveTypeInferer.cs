@@ -9,7 +9,7 @@ namespace LobCorp.Save.Type
 	{
 		private static readonly Dictionary<string, SaveType> map = new Dictionary<string, SaveType>()
 		{
-			{ "bgmVolume", SaveType.Settings },
+			{ "bgmVolume", SaveType.Options },
 			{ "sefirabossTutorialPlayed", SaveType.Etc },
 			{ "playTime", SaveType.Master },
 			{ "observe", SaveType.Global },

@@ -2,7 +2,7 @@ namespace LobCorp.Save.Type
 {
 	public enum SaveType
 	{
-		Settings,
+		Options,
 		Etc,
 		Master,
 		Global,

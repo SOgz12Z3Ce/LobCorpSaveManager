@@ -13,7 +13,7 @@ namespace LobCorp.Save.Serializers
 	{
 		private static readonly Dictionary<SaveType, string> defaultFileNameMap = new Dictionary<SaveType, string>()
 		{
-			{ SaveType.Settings, "settings.json" },
+			{ SaveType.Options, "options.json" },
 			{ SaveType.Etc, "etc.json" },
 			{ SaveType.Master, "master.json" },
 			{ SaveType.Global, "global.json" },

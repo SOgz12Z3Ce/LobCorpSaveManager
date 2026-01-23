@@ -1,7 +1,6 @@
 use std::{fmt::Display, fs::File, io::Read, str::FromStr};
 
-pub mod settings;
-trait Save {}
+pub mod options;
 
 #[derive(Debug)]
 pub enum Error {
@@ -27,7 +26,9 @@ impl std::error::Error for Error {
         }
     }
 }
+trait Save {
 
+}
 pub trait RawSave: FromStr
 where
     <Self as FromStr>::Err: std::error::Error + 'static,

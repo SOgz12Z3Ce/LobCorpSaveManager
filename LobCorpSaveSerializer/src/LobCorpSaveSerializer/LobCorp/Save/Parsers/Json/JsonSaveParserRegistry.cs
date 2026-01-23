@@ -7,7 +7,7 @@ namespace LobCorp.Save.Parsers.Json
 	{
 		public static readonly Dictionary<SaveType, JsonSaveParserBase> ParsersMap = new Dictionary<SaveType, JsonSaveParserBase>()
 		{
-			{ SaveType.Settings, new SettingsJsonSaveParser() },
+			{ SaveType.Options, new SettingsJsonSaveParser() },
 			{ SaveType.Etc, new EtcJsonSaveParser() },
 			{ SaveType.Master, new MasterJsonSaveParser() },
 			{ SaveType.Global, new GlobalJsonSaveParser() },

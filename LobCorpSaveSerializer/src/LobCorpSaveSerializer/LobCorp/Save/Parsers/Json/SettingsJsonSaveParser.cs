@@ -5,7 +5,7 @@ namespace LobCorp.Save.Parsers.Json
 {
 	public class SettingsJsonSaveParser : JsonSaveParserBase
 	{
-		public SettingsJsonSaveParser() : base(Type.SaveType.Settings)
+		public SettingsJsonSaveParser() : base(Type.SaveType.Options)
 		{
 		}
 		protected override Dictionary<string, object> Parse(JObject save)
