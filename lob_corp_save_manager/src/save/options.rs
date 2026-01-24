@@ -8,7 +8,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::save::{RawSave, Save};
 
-#[derive(Debug)]
+pub struct OptionsSave {
+    pub language: Language,
+    pub tooltips_enabled: Toggle,
+    pub backer_abnormalities_enabled: Toggle,
+    pub master_volume: Factor,
+    pub music_volume: Percentage,
+    pub last_log_index: i32,
+}
+
 pub enum Language {
     English,
     Korean,
@@ -23,23 +31,31 @@ pub enum Language {
     PortuguesePortugal,
 }
 
-#[derive(Debug)]
 pub struct Toggle(bool);
 
-#[derive(Debug)]
 pub struct Factor(f32);
 
-#[derive(Debug)]
-pub struct IndexCycle(u8);
+pub struct Percentage(f32);
 
-#[derive(Debug)]
-pub struct OptionsSave {
-    pub language: Language,
-    pub tooltips_enabled: Toggle,
-    pub backer_abnormalities_enabled: Toggle,
-    pub master_volume: Factor,
-    pub music_volume: Factor,
-    pub log_index: IndexCycle,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct OptionsRawSave {
+    #[serde(rename = "masterVolume")]
+    master_volume: f32,
+
+    #[serde(rename = "bgmVolume")]
+    music_volume: f32,
+
+    #[serde(rename = "tooltip")]
+    tooltips_enabled: bool,
+
+    #[serde(rename = "dlcCreatureOn")]
+    backer_abnormalities_enabled: bool,
+
+    #[serde(rename = "language")]
+    language: String,
+
+    #[serde(rename = "logIndex")]
+    last_log_index: i32,
 }
 
 #[derive(Debug)]
@@ -47,7 +63,29 @@ pub enum Error {
     InvalidLanguage(String),
     UnsupportedLanguage(String),
     InvalidFactorValue(f32),
-    InvalidIndexCycleValue(i32),
+    InvalidPercentageValue(f32),
+}
+
+impl Display for OptionsSave {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "==== Options ====")?;
+        writeln!(f, "Game:")?;
+        writeln!(f, "  Language: {}", self.language)?;
+        writeln!(f, "  Display Tooltips: {}", self.tooltips_enabled)?;
+        writeln!(
+            f,
+            "  Enable Backer Abnormalities: {}",
+            self.backer_abnormalities_enabled
+        )?;
+
+        writeln!(f, "Audio:")?;
+        writeln!(f, "  Master Volume: {}", self.master_volume)?;
+        writeln!(f, "  Music Volume: {}", self.music_volume)?;
+
+        writeln!(f, "Debug:")?;
+        write!(f, "  Last Log Index: {}", self.last_log_index)?;
+        Ok(())
+    }
 }
 
 impl TryFrom<OptionsRawSave> for OptionsSave {
@@ -59,37 +97,15 @@ impl TryFrom<OptionsRawSave> for OptionsSave {
             backer_abnormalities_enabled: value.backer_abnormalities_enabled.into(),
             master_volume: value.master_volume.try_into()?,
             music_volume: value.music_volume.try_into()?,
-            log_index: value.log_index.try_into()?,
+            last_log_index: value.last_log_index,
         })
     }
 }
 
 impl Save<OptionsRawSave> for OptionsSave {}
 
-impl Display for OptionsSave {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "==== Options ====")?;
-        writeln!(f, "Game:")?;
-        writeln!(f, "  Language: {}", self.language)?;
-        writeln!(f, "  Display Tooltips: {}", self.tooltips_enabled.as_word())?;
-        writeln!(
-            f,
-            "  Enable Backer Abnormalities: {}",
-            self.backer_abnormalities_enabled.as_word()
-        )?;
-
-        writeln!(f, "Audio:")?;
-        writeln!(f, "  Master Volume: {}%", self.master_volume.0 * 100.0)?;
-        writeln!(f, "  Music Volume: {}%", self.music_volume.0 * 100.0)?;
-
-        writeln!(f, "Debug:")?;
-        write!(f, "  Log Index: {}", self.log_index.0)?;
-        Ok(())
-    }
-}
-
 impl Language {
-    fn as_str(&self) -> &'static str {
+    fn as_raw_str(&self) -> &'static str {
         match self {
             Language::English => "en",
             Language::Korean => "kr",
@@ -149,11 +165,11 @@ impl FromStr for Language {
     }
 }
 
-impl Toggle {
-    fn as_word(&self) -> &'static str {
+impl Display for Toggle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self(true) => "on",
-            Self(false) => "off",
+            Self(true) => write!(f, "on"),
+            Self(false) => write!(f, "off"),
         }
     }
 }
@@ -164,10 +180,16 @@ impl From<bool> for Toggle {
     }
 }
 
+impl Display for Factor {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}x", self.0)
+    }
+}
+
 impl TryFrom<f32> for Factor {
     type Error = Error;
     fn try_from(value: f32) -> Result<Self, Self::Error> {
-        if value >= 0.0 && value <= 1.0 {
+        if value > 0.0 {
             Ok(Self(value))
         } else {
             Err(Error::InvalidFactorValue(value))
@@ -175,34 +197,45 @@ impl TryFrom<f32> for Factor {
     }
 }
 
-impl TryFrom<u8> for IndexCycle {
+impl Display for Percentage {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}%", self.0 * 100.0)
+    }
+}
+
+impl TryFrom<f32> for Percentage {
     type Error = Error;
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        if value < 10 {
+    fn try_from(value: f32) -> Result<Self, Self::Error> {
+        if value >= 0.0 && value <= 1.0 {
             Ok(Self(value))
         } else {
-            Err(Error::InvalidIndexCycleValue(value.into()))
+            Err(Error::InvalidPercentageValue(value))
         }
     }
 }
 
-impl TryFrom<i32> for IndexCycle {
-    type Error = Error;
-    fn try_from(value: i32) -> Result<Self, Self::Error> {
-        let value_u8: u8 = value
-            .try_into()
-            .map_err(|_| Error::InvalidIndexCycleValue(value))?;
-        Self::try_from(value_u8)
+impl From<OptionsSave> for OptionsRawSave {
+    fn from(value: OptionsSave) -> Self {
+        Self {
+            master_volume: value.master_volume.0,
+            music_volume: value.music_volume.0,
+            tooltips_enabled: value.tooltips_enabled.0,
+            backer_abnormalities_enabled: value.backer_abnormalities_enabled.0,
+            language: value.language.as_raw_str().to_owned(),
+            last_log_index: value.last_log_index,
+        }
     }
 }
+
+impl RawSave<OptionsSave> for OptionsRawSave {}
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::InvalidFactorValue(v) => write!(f, "{} is not in [0, 1].", v)?,
-            Error::InvalidIndexCycleValue(v) => write!(f, "{} is not in [0, 10).", v)?,
             Error::InvalidLanguage(s) => write!(f, "{} is not a vaild language.", s)?,
             Error::UnsupportedLanguage(s) => write!(f, "{} is not suppored in regular game.", s)?,
+            Error::InvalidFactorValue(v) => write!(f, "{} is negative.", v)?,
+            Error::InvalidPercentageValue(v) => write!(f, "{} is not in [0, 1].", v)?,
         }
         Ok(())
     }
@@ -213,39 +246,3 @@ impl core::error::Error for Error {
         None
     }
 }
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct OptionsRawSave {
-    #[serde(rename = "masterVolume")]
-    master_volume: f32,
-
-    #[serde(rename = "bgmVolume")]
-    music_volume: f32,
-
-    #[serde(rename = "tooltip")]
-    tooltips_enabled: bool,
-
-    #[serde(rename = "dlcCreatureOn")]
-    backer_abnormalities_enabled: bool,
-
-    #[serde(rename = "language")]
-    language: String,
-
-    #[serde(rename = "logIndex")]
-    log_index: i32,
-}
-
-impl From<OptionsSave> for OptionsRawSave {
-    fn from(value: OptionsSave) -> Self {
-        Self {
-            master_volume: value.master_volume.0,
-            music_volume: value.music_volume.0,
-            tooltips_enabled: value.tooltips_enabled.0,
-            backer_abnormalities_enabled: value.backer_abnormalities_enabled.0,
-            language: value.language.as_str().to_owned(),
-            log_index: value.log_index.0.into(),
-        }
-    }
-}
-
-impl RawSave<OptionsSave> for OptionsRawSave {}
