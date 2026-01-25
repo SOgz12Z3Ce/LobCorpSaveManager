@@ -14,7 +14,7 @@ pub struct OptionsSave {
     pub backer_abnormalities_enabled: Toggle,
     pub master_volume: Factor,
     pub music_volume: Percentage,
-    pub last_log_index: i32,
+    pub last_log_index: LastLogIndex,
 }
 
 pub enum Language {
@@ -24,6 +24,7 @@ pub enum Language {
     ChineseTraditional,
     Japanese,
     Russian,
+    Vietnamese,
     Bulgarian,
     SpanishLatinAmerica,
     French,
@@ -36,6 +37,8 @@ pub struct Toggle(bool);
 pub struct Factor(f32);
 
 pub struct Percentage(f32);
+
+pub struct LastLogIndex(i8);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct OptionsRawSave {
@@ -61,9 +64,9 @@ pub struct OptionsRawSave {
 #[derive(Debug)]
 pub enum Error {
     InvalidLanguage(String),
-    UnsupportedLanguage(String),
     InvalidFactorValue(f32),
     InvalidPercentageValue(f32),
+    InvalidLastLogIndex(i32),
 }
 
 impl Display for OptionsSave {
@@ -97,7 +100,7 @@ impl TryFrom<OptionsRawSave> for OptionsSave {
             backer_abnormalities_enabled: value.backer_abnormalities_enabled.into(),
             master_volume: value.master_volume.try_into()?,
             music_volume: value.music_volume.try_into()?,
-            last_log_index: value.last_log_index,
+            last_log_index: value.last_log_index.try_into()?,
         })
     }
 }
@@ -113,6 +116,7 @@ impl Language {
             Language::ChineseTraditional => "cn_tr",
             Language::Japanese => "jp",
             Language::Russian => "ru",
+            Language::Vietnamese => "vn",
             Language::Bulgarian => "bg",
             Language::SpanishLatinAmerica => "es",
             Language::French => "fr",
@@ -134,6 +138,7 @@ impl Display for Language {
                 Language::ChineseTraditional => "中文(繁體)",
                 Language::Japanese => "日本語",
                 Language::Russian => "русский",
+                Language::Vietnamese => "tiếng Việt",
                 Language::Bulgarian => "български",
                 Language::SpanishLatinAmerica => "Español Latinoamérica",
                 Language::French => "français",
@@ -146,21 +151,21 @@ impl Display for Language {
 
 impl FromStr for Language {
     type Err = Error;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+    fn from_str(str: &str) -> Result<Self, Self::Err> {
+        match str {
             "en" => Ok(Language::English),
             "kr" => Ok(Language::Korean),
             "cn" => Ok(Language::ChineseSimplified),
             "cn_tr" => Ok(Language::ChineseTraditional),
             "jp" => Ok(Language::Japanese),
             "ru" => Ok(Language::Russian),
-            "vn" => Err(Error::UnsupportedLanguage("vn".to_owned())),
+            "vn" => Ok(Language::Vietnamese),
             "bg" => Ok(Language::Bulgarian),
             "es" => Ok(Language::SpanishLatinAmerica),
             "fr" => Ok(Language::French),
             "pt_br" => Ok(Language::PortugueseBrazil),
             "pt_pt" => Ok(Language::PortuguesePortugal),
-            _ => Err(Error::InvalidLanguage(s.to_owned())),
+            _ => Err(Error::InvalidLanguage(str.to_owned())),
         }
     }
 }
@@ -214,6 +219,43 @@ impl TryFrom<f32> for Percentage {
     }
 }
 
+impl LastLogIndex {
+    fn next(&self) -> Self {
+        match self {
+            Self(i @ -10..=8) => (i + 1).try_into().unwrap(),
+            Self(9) => 0.try_into().unwrap(),
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl Display for LastLogIndex {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}(Next: {})", self.0, self.next().0)
+    }
+}
+
+impl TryFrom<i8> for LastLogIndex {
+    type Error = Error;
+    fn try_from(value: i8) -> Result<Self, Self::Error> {
+        if value >= -10 && value < 10 {
+            Ok(Self(value))
+        } else {
+            Err(Error::InvalidLastLogIndex(value.into()))
+        }
+    }
+}
+
+impl TryFrom<i32> for LastLogIndex {
+    type Error = Error;
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        let value_i8: i8 = value
+            .try_into()
+            .map_err(|_| Error::InvalidLastLogIndex(value))?;
+        Self::try_from(value_i8)
+    }
+}
+
 impl From<OptionsSave> for OptionsRawSave {
     fn from(value: OptionsSave) -> Self {
         Self {
@@ -222,7 +264,7 @@ impl From<OptionsSave> for OptionsRawSave {
             tooltips_enabled: value.tooltips_enabled.0,
             backer_abnormalities_enabled: value.backer_abnormalities_enabled.0,
             language: value.language.as_raw_str().to_owned(),
-            last_log_index: value.last_log_index,
+            last_log_index: value.last_log_index.0.into(),
         }
     }
 }
@@ -232,10 +274,10 @@ impl RawSave<OptionsSave> for OptionsRawSave {}
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::InvalidLanguage(s) => write!(f, "{} is not a vaild language.", s)?,
-            Error::UnsupportedLanguage(s) => write!(f, "{} is not suppored in regular game.", s)?,
-            Error::InvalidFactorValue(v) => write!(f, "{} is negative.", v)?,
-            Error::InvalidPercentageValue(v) => write!(f, "{} is not in [0, 1].", v)?,
+            Error::InvalidLanguage(str) => write!(f, "{} is not a vaild language.", str)?,
+            Error::InvalidFactorValue(value) => write!(f, "{} is negative.", value)?,
+            Error::InvalidPercentageValue(value) => write!(f, "{} is not in [0, 1].", value)?,
+            Error::InvalidLastLogIndex(value) => write!(f, "{} is not in [-10, 9].", value)?,
         }
         Ok(())
     }
