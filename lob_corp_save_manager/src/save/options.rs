@@ -31,7 +31,6 @@ pub enum Language {
     PortugueseBrazil,
     PortuguesePortugal,
 }
-
 pub struct Toggle(bool);
 
 pub struct Factor(f32);

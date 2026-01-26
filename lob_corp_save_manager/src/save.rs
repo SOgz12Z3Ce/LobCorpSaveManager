@@ -6,7 +6,39 @@ use std::{
 
 use serde::{Serialize, de::DeserializeOwned};
 
+pub mod etc;
 pub mod options;
+
+pub trait Save<R>: TryFrom<R>
+where
+    R: RawSave<Self>,
+    <Self as TryFrom<R>>::Error: 'static + std::error::Error,
+{
+    fn from_file(file: File) -> Result<Self, Error> {
+        let raw: R = serde_json::from_reader(file).map_err(Error::BadJsonFile)?;
+        raw.try_into().map_err(|e| Error::BadRawSave(Box::new(e)))
+    }
+    fn into_json(self) -> Result<String, serde_json::Error> {
+        let raw: R = self.into();
+        serde_json::to_string(&raw)
+    }
+    fn into_file(self, path: &str) -> Result<(), Error> {
+        let file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(path)
+            .map_err(|e| Error::OpenFileFail(path.to_owned(), e))?;
+        let writer = BufWriter::new(file);
+        let raw: R = self.into();
+        serde_json::to_writer(writer, &raw).map_err(|e| Error::WriteFileFail(path.to_owned(), e))
+    }
+}
+
+pub trait RawSave<S>: From<S> + Serialize + DeserializeOwned
+where
+    S: TryFrom<Self>,
+{
+}
 
 #[derive(Debug)]
 pub enum Error {
@@ -39,35 +71,4 @@ impl std::error::Error for Error {
             Self::WriteFileFail(_, e) => Some(e),
         }
     }
-}
-
-pub trait Save<R>: TryFrom<R>
-where
-    R: RawSave<Self>,
-    <Self as TryFrom<R>>::Error: 'static + std::error::Error,
-{
-    fn from_file(file: File) -> Result<Self, Error> {
-        let raw: R = serde_json::from_reader(file).map_err(Error::BadJsonFile)?;
-        raw.try_into().map_err(|e| Error::BadRawSave(Box::new(e)))
-    }
-    fn into_json(self) -> Result<String, serde_json::Error> {
-        let raw: R = self.into();
-        serde_json::to_string(&raw)
-    }
-    fn into_file(self, path: &str) -> Result<(), Error> {
-        let file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(path)
-            .map_err(|e| Error::OpenFileFail(path.to_owned(), e))?;
-        let writer = BufWriter::new(file);
-        let raw: R = self.into();
-        serde_json::to_writer(writer, &raw).map_err(|e| Error::WriteFileFail(path.to_owned(), e))
-    }
-}
-
-pub trait RawSave<S>: From<S> + Serialize + DeserializeOwned
-where
-    S: TryFrom<Self>,
-{
 }
