@@ -88,13 +88,10 @@ impl Display for EtcSave {
             "{}",
             self.pending_abnormalities
                 .iter()
-                .map(|item| item.as_simple_str())
+                .map(|item| format!("  {}", item.as_simple_str()))
                 .collect::<Vec<String>>()
                 .join("\n")
         )
-        // for abnormality in self.pending_abnormalities.iter() {
-        //     writeln!(f, "  {}", abnormality.as_simple_str())?;
-        // }
     }
 }
 
