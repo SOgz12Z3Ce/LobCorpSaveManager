@@ -1,16 +1,16 @@
 use std::fmt::{Display, Formatter};
 
-pub struct Abnormality {
+pub(crate) struct Abnormality {
     id: u32,
     // more fields are on the way...
 }
 
 #[derive(Debug)]
-pub enum Error {
+pub(crate) enum Error {
     BadID(i64),
 }
 
-pub trait TryLookup<T> {
+pub(crate) trait TryLookup<T> {
     fn try_lookup(id: T) -> Result<&'static Self, Error>;
 }
 
@@ -131,10 +131,10 @@ impl TryLookup<i64> for Abnormality {
 }
 
 impl Abnormality {
-    pub fn id(&self) -> u32 {
+    pub(crate) fn id(&self) -> u32 {
         self.id
     }
-    pub fn as_simple_str(&self) -> String {
+    pub(crate) fn as_simple_str(&self) -> String {
         format!("ID: {}", self.id)
     }
 }

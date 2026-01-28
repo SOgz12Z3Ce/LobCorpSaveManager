@@ -6,10 +6,10 @@ use std::{
 
 use serde::{Serialize, de::DeserializeOwned};
 
-pub mod etc;
-pub mod options;
+pub(crate) mod etc;
+pub(crate) mod options;
 
-pub trait Save<R>: TryFrom<R>
+pub(crate) trait Save<R>: TryFrom<R>
 where
     R: RawSave<Self>,
     <Self as TryFrom<R>>::Error: 'static + std::error::Error,
@@ -34,14 +34,14 @@ where
     }
 }
 
-pub trait RawSave<S>: From<S> + Serialize + DeserializeOwned
+pub(crate) trait RawSave<S>: From<S> + Serialize + DeserializeOwned
 where
     S: TryFrom<Self>,
 {
 }
 
 #[derive(Debug)]
-pub enum Error {
+pub(crate) enum Error {
     BadJsonFile(serde_json::Error),
     BadRawSave(Box<dyn std::error::Error>),
     OpenFileFail(String, io::Error),

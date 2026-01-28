@@ -8,16 +8,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::save::{RawSave, Save};
 
-pub struct OptionsSave {
-    pub language: Language,
-    pub tooltips_enabled: Toggle,
-    pub backer_abnormalities_enabled: Toggle,
-    pub master_volume: Factor,
-    pub music_volume: Percentage,
-    pub last_log_index: LastLogIndex,
+pub(crate) struct OptionsSave {
+    pub(crate) language: Language,
+    pub(crate) tooltips_enabled: Toggle,
+    pub(crate) backer_abnormalities_enabled: Toggle,
+    pub(crate) master_volume: Factor,
+    pub(crate) music_volume: Percentage,
+    pub(crate) last_log_index: LastLogIndex,
 }
 
-pub enum Language {
+pub(crate) enum Language {
     English,
     Korean,
     ChineseSimplified,
@@ -31,16 +31,16 @@ pub enum Language {
     PortugueseBrazil,
     PortuguesePortugal,
 }
-pub struct Toggle(bool);
+pub(crate) struct Toggle(bool);
 
-pub struct Factor(f32);
+pub(crate) struct Factor(f32);
 
-pub struct Percentage(f32);
+pub(crate) struct Percentage(f32);
 
-pub struct LastLogIndex(i8);
+pub(crate) struct LastLogIndex(i8);
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct OptionsRawSave {
+pub(crate) struct OptionsRawSave {
     #[serde(rename = "masterVolume")]
     master_volume: f32,
 
@@ -61,7 +61,7 @@ pub struct OptionsRawSave {
 }
 
 #[derive(Debug)]
-pub enum Error {
+pub(crate) enum Error {
     InvalidLanguage(String),
     InvalidFactorValue(f32),
     InvalidPercentageValue(f32),

@@ -1,1 +1,1 @@
-pub mod abnormality;
+pub(crate) mod abnormality;

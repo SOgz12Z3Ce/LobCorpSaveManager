@@ -7,20 +7,20 @@ use crate::{
     save::{RawSave, Save},
 };
 
-pub struct EtcSave {
-    pub is_core_suppression_tutorial_played: Flag,
-    pub is_kether_core_suppression_1_completed: Flag,
-    pub is_kether_core_suppression_2_completed: Flag,
-    pub is_kether_core_suppression_3_completed: Flag,
-    pub is_kether_core_suppression_4_completed: Flag,
-    pub is_kether_core_suppression_5_completed: Flag,
-    pub pending_abnormalities: Vec<&'static Abnormality>,
+pub(crate) struct EtcSave {
+    pub(crate) is_core_suppression_tutorial_played: Flag,
+    pub(crate) is_kether_core_suppression_1_completed: Flag,
+    pub(crate) is_kether_core_suppression_2_completed: Flag,
+    pub(crate) is_kether_core_suppression_3_completed: Flag,
+    pub(crate) is_kether_core_suppression_4_completed: Flag,
+    pub(crate) is_kether_core_suppression_5_completed: Flag,
+    pub(crate) pending_abnormalities: Vec<&'static Abnormality>,
 }
 
-pub struct Flag(bool);
+pub(crate) struct Flag(bool);
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct EtcRawSave {
+pub(crate) struct EtcRawSave {
     #[serde(rename = "sefirabossTutorialPlayed")]
     is_core_suppression_tutorial_played: bool,
 
@@ -44,7 +44,7 @@ pub struct EtcRawSave {
 }
 
 #[derive(Debug)]
-pub enum Error {
+pub(crate) enum Error {
     BadID(i64),
 }
 
