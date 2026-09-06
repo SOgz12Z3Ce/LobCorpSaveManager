@@ -2,7 +2,7 @@ use thiserror::Error;
 use winnow::error::{ContextError, ParseError};
 
 #[derive(Debug, Error)]
-pub enum Error {
+pub(crate) enum Error {
     #[error("method has not been implemented")]
     #[allow(dead_code)]
     NotImplemented,

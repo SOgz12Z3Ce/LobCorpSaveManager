@@ -11,13 +11,13 @@ use winnow::{
     token::{literal, rest, take},
 };
 
-pub fn parse(input: Vec<u8>) -> Result<File, Error> {
+pub(crate) fn parse(input: Vec<u8>) -> Result<File, Error> {
     let (file, _) = (parser, rest).parse(&input)?;
 
     Ok(file)
 }
 
-pub fn parser(input: &mut &[u8]) -> winnow::Result<File> {
+pub(crate) fn parser(input: &mut &[u8]) -> winnow::Result<File> {
     magic_parser.parse_next(input)?;
     let root = element_parser.parse_next(input)?;
     let obj2 = element_parser.parse_next(input)?;
@@ -28,7 +28,7 @@ pub fn parser(input: &mut &[u8]) -> winnow::Result<File> {
     })
 }
 
-fn magic_parser(input: &mut &[u8]) -> winnow::Result<()> {
+pub(crate) fn magic_parser(input: &mut &[u8]) -> winnow::Result<()> {
     literal(0x00).parse_next(input)?;
     le_i32.verify(|i| *i == 1).parse_next(input)?;
     le_i32.verify(|i| *i == -1).parse_next(input)?;
@@ -38,7 +38,7 @@ fn magic_parser(input: &mut &[u8]) -> winnow::Result<()> {
     Ok(())
 }
 
-fn element_parser(input: &mut &[u8]) -> winnow::Result<Element> {
+pub(crate) fn element_parser(input: &mut &[u8]) -> winnow::Result<Element> {
     let kind = element_kind_parser.parse_next(input)?;
     match kind {
         ElementKind::RefTypeObject => {
@@ -120,13 +120,13 @@ fn element_parser(input: &mut &[u8]) -> winnow::Result<Element> {
     }
 }
 
-fn element_kind_parser(input: &mut &[u8]) -> winnow::Result<ElementKind> {
+pub(crate) fn element_kind_parser(input: &mut &[u8]) -> winnow::Result<ElementKind> {
     u8.parse_next(input)?
         .try_into()
         .map_err(|e| ContextError::from_external_error(input, e))
 }
 
-fn id_parser(input: &mut &[u8]) -> winnow::Result<Id> {
+pub(crate) fn id_parser(input: &mut &[u8]) -> winnow::Result<Id> {
     // Store in file as u32. Process in C# as i64.
     le_u32
         .parse_next(input)?
@@ -134,14 +134,14 @@ fn id_parser(input: &mut &[u8]) -> winnow::Result<Id> {
         .map_err(|e| ContextError::from_external_error(input, e))
 }
 
-fn runtime_class_parser(input: &mut &[u8]) -> winnow::Result<Class> {
+pub(crate) fn runtime_class_parser(input: &mut &[u8]) -> winnow::Result<Class> {
     let class = leb128_string_parser.parse_next(input)?;
     let class = Class::from_str(&class).map_err(|e| ContextError::from_external_error(input, e))?;
 
     Ok(class)
 }
 
-fn leb128_string_parser(input: &mut &[u8]) -> winnow::Result<String> {
+pub(crate) fn leb128_string_parser(input: &mut &[u8]) -> winnow::Result<String> {
     let length = {
         let mut buffer = 0i32; // sic
         let mut shift = 0usize;
@@ -175,7 +175,7 @@ fn leb128_string_parser(input: &mut &[u8]) -> winnow::Result<String> {
     Ok(string.to_owned())
 }
 
-fn count_parser(input: &mut &[u8]) -> winnow::Result<usize> {
+pub(crate) fn count_parser(input: &mut &[u8]) -> winnow::Result<usize> {
     // Store in file as i32. Process in C# as i32.
     let count = le_i32.parse_next(input)?;
     if count < 0 {
@@ -187,13 +187,15 @@ fn count_parser(input: &mut &[u8]) -> winnow::Result<usize> {
     }
 }
 
-fn field_kind_parser(input: &mut &[u8]) -> winnow::Result<FieldKind> {
+pub(crate) fn field_kind_parser(input: &mut &[u8]) -> winnow::Result<FieldKind> {
     u8.parse_next(input)?
         .try_into()
         .map_err(|e| ContextError::from_external_error(input, e))
 }
 
-fn class_for_field_kind<'a>(kind: FieldKind) -> impl Parser<&'a [u8], Class, ContextError> {
+pub(crate) fn class_for_field_kind<'a>(
+    kind: FieldKind,
+) -> impl Parser<&'a [u8], Class, ContextError> {
     match kind {
         FieldKind::PrimitiveType => primitive_class_parser,
         FieldKind::String => string_class_parser,
@@ -202,21 +204,23 @@ fn class_for_field_kind<'a>(kind: FieldKind) -> impl Parser<&'a [u8], Class, Con
     }
 }
 
-fn primitive_class_parser(input: &mut &[u8]) -> winnow::Result<Class> {
+pub(crate) fn primitive_class_parser(input: &mut &[u8]) -> winnow::Result<Class> {
     u8.parse_next(input)?
         .try_into()
         .map_err(|e| ContextError::from_external_error(input, e))
 }
 
-fn string_class_parser(_input: &mut &[u8]) -> winnow::Result<Class> {
+pub(crate) fn string_class_parser(_input: &mut &[u8]) -> winnow::Result<Class> {
     Ok(Class::String)
 }
 
-fn object_class_parser(_input: &mut &[u8]) -> winnow::Result<Class> {
+pub(crate) fn object_class_parser(_input: &mut &[u8]) -> winnow::Result<Class> {
     Ok(Class::Object)
 }
 
-fn field_value_for_class<'a>(class: Class) -> impl Parser<&'a [u8], FieldValue, ContextError> {
+pub(crate) fn field_value_for_class<'a>(
+    class: Class,
+) -> impl Parser<&'a [u8], FieldValue, ContextError> {
     match class {
         Class::Int => int_field_value_parser,
         Class::Float => float_field_value_parser,
@@ -229,19 +233,19 @@ fn field_value_for_class<'a>(class: Class) -> impl Parser<&'a [u8], FieldValue, 
     }
 }
 
-fn int_field_value_parser(input: &mut &[u8]) -> winnow::Result<FieldValue> {
+pub(crate) fn int_field_value_parser(input: &mut &[u8]) -> winnow::Result<FieldValue> {
     let value = le_i32.parse_next(input)?;
 
     Ok(FieldValue::Int(value))
 }
 
-fn float_field_value_parser(input: &mut &[u8]) -> winnow::Result<FieldValue> {
+pub(crate) fn float_field_value_parser(input: &mut &[u8]) -> winnow::Result<FieldValue> {
     let value = le_f32.parse_next(input)?;
 
     Ok(FieldValue::Float(value))
 }
 
-fn element_field_value_parser(input: &mut &[u8]) -> winnow::Result<FieldValue> {
+pub(crate) fn element_field_value_parser(input: &mut &[u8]) -> winnow::Result<FieldValue> {
     let value = element_parser.parse_next(input)?;
 
     Ok(FieldValue::Object(value))
