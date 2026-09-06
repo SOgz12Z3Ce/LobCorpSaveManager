@@ -2,12 +2,12 @@ use crate::error::Error;
 use std::str::FromStr;
 
 #[derive(Debug)]
-pub(crate) struct File {
-    pub(crate) elements: Vec<Element>,
+pub struct File {
+    pub elements: Vec<Element>,
 }
 
 #[derive(Debug)]
-pub(crate) enum Element {
+pub enum Element {
     RefTypeObject {
         id: Id,
         ref_id: Id,
@@ -43,7 +43,7 @@ pub(crate) enum Element {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum ElementKind {
+pub enum ElementKind {
     RefTypeObject,
     RuntimeObject,
     String,
@@ -69,7 +69,7 @@ impl TryFrom<u8> for ElementKind {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct Id(u64);
+pub struct Id(u64);
 
 impl TryFrom<u32> for Id {
     type Error = Error;
@@ -83,7 +83,7 @@ impl TryFrom<u32> for Id {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum FieldKind {
+pub enum FieldKind {
     PrimitiveType,
     String,
     ObjectType,
@@ -105,7 +105,7 @@ impl TryFrom<u8> for FieldKind {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) enum Class {
+pub enum Class {
     Int,
     Float,
     String,
@@ -151,7 +151,7 @@ impl FromStr for Class {
 }
 
 #[derive(Debug)]
-pub(crate) enum FieldValue {
+pub enum FieldValue {
     Int(i32),
     Float(f32),
     String(String),
