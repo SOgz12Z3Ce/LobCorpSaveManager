@@ -30,13 +30,21 @@ pub fn parse(input: Vec<u8>) -> Result<File, Error> {
 
 pub fn parser(input: &mut Stream) -> winnow::Result<File> {
     magic_parser.parse_next(input)?;
-    let root = element_parser.parse_next(input)?;
-    let obj2 = element_parser.parse_next(input)?;
-    let obj3 = element_parser.parse_next(input)?;
+    let elements = {
+        let mut buffer = vec![];
+        let mut end = false;
+        while !end {
+            let element = element_parser.parse_next(input)?;
+            end = match element {
+                Element::End => true,
+                _ => false,
+            };
+            buffer.push(element);
+        }
+        buffer
+    };
 
-    Ok(File {
-        elements: vec![root, obj2, obj3],
-    })
+    Ok(File { elements })
 }
 
 pub fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
@@ -152,6 +160,7 @@ pub fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
 
             Ok(Element::ObjectReference { id })
         }
+        ElementKind::End => Ok(Element::End),
     }
 }
 

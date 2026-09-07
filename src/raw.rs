@@ -38,6 +38,7 @@ pub enum Element {
     ObjectReference {
         id: Id,
     },
+    End,
 }
 
 #[derive(Debug, Clone)]
@@ -56,6 +57,7 @@ pub enum ElementKind {
     GenericArray,
     BoxedPrimitiveTypeValue,
     ObjectReference,
+    End,
 }
 
 impl TryFrom<u8> for ElementKind {
@@ -69,6 +71,7 @@ impl TryFrom<u8> for ElementKind {
             0x07 => Ok(Self::GenericArray),
             0x08 => Ok(Self::BoxedPrimitiveTypeValue),
             0x09 => Ok(Self::ObjectReference),
+            0x0B => Ok(Self::End),
             _ => Err(Self::Error::InvalidElementKind(value)),
         }
     }
