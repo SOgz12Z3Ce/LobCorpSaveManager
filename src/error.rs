@@ -8,7 +8,7 @@ pub enum Error {
     NotImplemented,
 
     #[error("parse failed at '{offset}'")]
-    ParseError { offset: usize },
+    ParseError { message: String, offset: usize },
 
     #[error("element kind '{0}' is invalid")]
     InvalidElementKind(u8),
@@ -26,10 +26,10 @@ pub enum Error {
     InvalidFieldKind(u8),
 }
 
-impl From<ParseError<&[u8], ContextError>> for Error {
-    fn from(value: ParseError<&[u8], ContextError>) -> Self {
-        println!("{}", value.inner());
+impl<I> From<ParseError<I, ContextError>> for Error {
+    fn from(value: ParseError<I, ContextError>) -> Self {
         Self::ParseError {
+            message: value.inner().to_string(),
             offset: value.offset(),
         }
     }
