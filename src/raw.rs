@@ -11,14 +11,12 @@ pub enum Element {
     RefTypeObject {
         id: Id,
         ref_id: Id,
+        field_values: Vec<FieldValue>,
     },
     RuntimeObject {
         id: Id,
         class: Class,
-        field_count: usize,
-        field_names: Vec<String>,
-        field_kinds: Vec<FieldKind>,
-        field_classes: Vec<Class>,
+        field_meta: FieldMeta,
         field_values: Vec<FieldValue>,
     },
     String {
@@ -40,6 +38,14 @@ pub enum Element {
     ObjectReference {
         id: Id,
     },
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldMeta {
+    pub count: usize,
+    pub names: Vec<String>,
+    pub kinds: Vec<FieldKind>,
+    pub classes: Vec<Class>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -68,7 +74,7 @@ impl TryFrom<u8> for ElementKind {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Id(u64);
 
 impl TryFrom<u32> for Id {
@@ -106,6 +112,7 @@ impl TryFrom<u8> for FieldKind {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Class {
+    Bool,
     Int,
     Float,
     String,
@@ -121,6 +128,7 @@ impl TryFrom<u8> for Class {
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
+            0x01 => Ok(Self::Bool),
             0x08 => Ok(Self::Int),
             0x0B => Ok(Self::Float),
             _ => Err(Self::Error::InvalidPrimitiveClass(value)),
@@ -152,6 +160,7 @@ impl FromStr for Class {
 
 #[derive(Debug)]
 pub enum FieldValue {
+    Bool(bool),
     Int(i32),
     Float(f32),
     String(String),
