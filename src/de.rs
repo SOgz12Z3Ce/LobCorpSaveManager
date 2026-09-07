@@ -19,7 +19,7 @@ pub fn parse(input: Vec<u8>) -> Result<File, Error> {
     let state = State {
         metadata: HashMap::new(),
     };
-    let mut stream = Stream {
+    let stream = Stream {
         input: &input,
         state,
     };
