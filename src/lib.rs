@@ -1,7 +1,5 @@
-pub mod app;
-pub mod de;
-pub mod error;
-pub mod raw;
-pub mod stream;
+mod cli;
+mod error;
+mod serde;
 
-pub use app::run;
+pub use cli::run;
