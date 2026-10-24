@@ -1,14 +1,21 @@
+#[cfg(feature = "log")]
+mod log;
 mod parser;
 
 use winnow::{Parser, Stateful, token::rest};
 
+#[cfg(feature = "log")]
+use crate::serde::de::log::LogEngine;
 use crate::{
     error::Error,
     serde::{de::parser::parser, raw::File},
 };
 
 #[derive(Debug, Default)]
-struct State {}
+struct State {
+    #[cfg(feature = "log")]
+    pub(crate) log: LogEngine,
+}
 
 type Stream<'a> = Stateful<&'a [u8], State>;
 
