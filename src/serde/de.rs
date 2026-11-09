@@ -14,7 +14,7 @@ use crate::{
 #[derive(Debug, Default)]
 struct State {
     #[cfg(feature = "log")]
-    pub(crate) log: LogEngine,
+    log_engine: LogEngine,
 }
 
 type Stream<'a> = Stateful<&'a [u8], State>;
