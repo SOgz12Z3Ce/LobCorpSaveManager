@@ -37,21 +37,6 @@ where
     Ok(value)
 }
 
-// fn parse_next_with_log<'a, P, O, E>(
-//     input: &mut &'a Stream,
-//     parser: P,
-//     explaination: &str,
-// ) -> Result<O, E>
-// where
-//     P: Parser<&'a Stream<'a>, O, E>,
-//     O: Log,
-// {
-//     let value = parser.parse_next(input)?;
-//     #[cfg(feature = "log")]
-//     input.state.log_engine.log(value, explaination);
-//     Ok(value)
-// }
-
 pub(crate) fn parser(input: &mut Stream) -> winnow::Result<File> {
     begin(input, "main");
 
