@@ -1,4 +1,4 @@
-mod combinator;
+mod primitive;
 
 #[derive(Debug, Default)]
 pub(crate) struct LogEngine {
@@ -24,7 +24,13 @@ impl LogEngine {
         }
     }
 
-    pub(crate) fn log(&mut self, bytes: &[u8], message: &str) {
+    pub(crate) fn log<V>(&mut self, value: &V, explaination: &str)
+    where
+        V: Log,
+    {
+        let bytes = value.as_bytes();
+        let content = value.to_log();
+
         // Header
         println!("         00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F");
 
@@ -55,7 +61,13 @@ impl LogEngine {
         println!("{}", self.parsers.join("/"));
 
         // Message
-        println!("    {message}");
+        println!("    \x1b[93m{content}\x1b[0m  {explaination}");
         println!("--------------------------------------------------------");
     }
+}
+
+pub(crate) trait Log {
+    fn as_bytes(&self) -> Vec<u8>;
+
+    fn to_log(&self) -> String;
 }
