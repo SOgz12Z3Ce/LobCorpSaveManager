@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::serde::de::log::Log;
 
 impl Log for &[u8] {
@@ -7,14 +9,9 @@ impl Log for &[u8] {
 
     fn to_log(&self) -> String {
         if self.len() == 1 {
-            format!("{:02X}", self[0])
+            format!("0x{:02X}", self[0])
         } else {
-            let s = String::from("[");
-            let s = self
-                .iter()
-                .map(|i| format!("{i:02X}"))
-                .fold(s, |acc, i| acc + &i + ", ");
-            s + "]"
+            String::from("[") + &self.iter().map(|i| format!("0x{i:02X}")).join(", ") + "]"
         }
     }
 }

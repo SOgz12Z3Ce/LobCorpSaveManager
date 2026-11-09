@@ -64,12 +64,12 @@ fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
     parse_next(
         input,
         le_i32.verify(|i| *i == -1),
-        "Magic number, little endian 32-bit signed '-1' at offset 5h.",
+        "Has header flag, little endian 32-bit signed '2' for has one, '-1' for doesn't have one. Saves always don't have headers.",
     )?;
     parse_next(
         input,
         le_i32.verify(|i| *i == 1),
-        "Magic number, little endian 32-bit signed '-1' at offset 9h.",
+        "Magic number, little endian 32-bit signed '1' at offset 9h.",
     )?;
     parse_next(
         input,

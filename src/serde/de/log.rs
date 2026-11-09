@@ -1,3 +1,6 @@
+use itertools::Itertools;
+use winnow::Parser;
+
 mod primitive;
 
 #[derive(Debug, Default)]
@@ -61,7 +64,32 @@ impl LogEngine {
         println!("{}", self.parsers.join("/"));
 
         // Message
-        println!("    \x1b[93m{content}\x1b[0m  {explaination}");
+        println!("    \x1b[93m{content}\x1b[0m  ");
+        let words = explaination.split(' ');
+        let mut line_len = -1;
+        for word in words {
+            // eprintln!("{word}, {line_len}");
+            let word_len = word.chars().count() as i32;
+            if line_len == -1 {
+                print!("   ");
+            }
+            if line_len + word_len <= 52 {
+                line_len += word_len + 1;
+                print!(" {word}");
+                continue;
+            }
+
+            // New line
+            if word_len <= 52 {
+                line_len = word_len;
+                println!("");
+                print!("    {word}");
+                continue;
+            }
+
+            todo!("Nah, I won't write such long word in an explaination.");
+        }
+        println!("");
         println!("--------------------------------------------------------");
     }
 }
