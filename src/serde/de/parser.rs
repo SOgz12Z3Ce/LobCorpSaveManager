@@ -1,8 +1,13 @@
-use winnow::{Parser, binary::le_i32, token::literal};
+mod magic;
+
+use winnow::Parser;
 
 #[cfg(feature = "log")]
 use crate::serde::de::log::Log;
-use crate::serde::{de::Stream, raw::File};
+use crate::serde::{
+    de::{Stream, parser::magic::magic_parser},
+    raw::File,
+};
 
 fn begin(_input: &mut Stream, _parser: &'static str) {
     #[cfg(feature = "log")]
@@ -45,38 +50,4 @@ pub(crate) fn parser(input: &mut Stream) -> winnow::Result<File> {
 
     end(input);
     Ok(File::new(elements))
-}
-
-fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
-    begin(input, "magic");
-
-    parse_next(
-        input,
-        literal(0x00),
-        "Magic number, byte '0x00' at offset 0h.",
-    )?;
-
-    parse_next(
-        input,
-        le_i32.verify(|i| *i == 1),
-        "Magic number, little endian 32-bit signed '1' at offset 1h.",
-    )?;
-    parse_next(
-        input,
-        le_i32.verify(|i| *i == -1),
-        "Has header flag, little endian 32-bit signed '2' for has one, '-1' for doesn't have one. Saves always don't have headers.",
-    )?;
-    parse_next(
-        input,
-        le_i32.verify(|i| *i == 1),
-        "Magic number, little endian 32-bit signed '1' at offset 9h.",
-    )?;
-    parse_next(
-        input,
-        le_i32.verify(|i| *i == 0),
-        "Magic number, little endian 32-bit signed '0' at offset Dh.",
-    )?;
-
-    end(input);
-    Ok(())
 }
