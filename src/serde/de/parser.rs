@@ -1,11 +1,11 @@
-mod magic;
+mod top;
 
 use winnow::Parser;
 
 #[cfg(feature = "log")]
 use crate::serde::de::log::Log;
 use crate::serde::{
-    de::{Stream, parser::magic::magic_parser},
+    de::{Stream, parser::top::magic_parser},
     raw::File,
 };
 
