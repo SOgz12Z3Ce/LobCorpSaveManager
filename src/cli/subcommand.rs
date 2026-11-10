@@ -8,6 +8,6 @@ pub(crate) fn deserialize<P: AsRef<Path>>(file: P) -> Result<(), Error> {
     file.read_to_end(&mut content)?;
 
     let file = de::parse(&content)?;
-    println!("{file:?}"); // FIXME: Use a better way to display.
+    println!("{file}");
     Ok(())
 }
