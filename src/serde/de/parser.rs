@@ -1,3 +1,4 @@
+mod element;
 mod top;
 
 use winnow::Parser;
@@ -5,7 +6,10 @@ use winnow::Parser;
 #[cfg(feature = "log")]
 use crate::serde::de::log::Log;
 use crate::serde::{
-    de::{Stream, parser::top::magic_parser},
+    de::{
+        Stream,
+        parser::top::{elements_parser, magic_parser},
+    },
     raw::File,
 };
 
@@ -46,7 +50,7 @@ pub(crate) fn parser(input: &mut Stream) -> winnow::Result<File> {
     begin(input, "main");
 
     magic_parser.parse_next(input)?;
-    let elements = Vec::new();
+    let elements = elements_parser.parse_next(input)?;
 
     end(input);
     Ok(File::new(elements))

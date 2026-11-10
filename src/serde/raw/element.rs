@@ -1,2 +1,4 @@
 #[derive(Debug)]
-pub(crate) enum Element {}
+pub(crate) enum Element {
+    End,
+}

@@ -1,6 +1,6 @@
 use crate::serde::raw::element::Element;
 
-mod element;
+pub(crate) mod element;
 
 #[derive(Debug)]
 pub(crate) struct File {

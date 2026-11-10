@@ -1,6 +1,12 @@
 use winnow::{Parser, binary::le_i32, token::literal};
 
-use crate::serde::de::{Stream, parser};
+use crate::serde::{
+    de::{
+        Stream,
+        parser::{self, element::element_parser},
+    },
+    raw::element::Element,
+};
 
 pub(crate) fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
     parser::begin(input, "magic");
@@ -34,4 +40,18 @@ pub(crate) fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
 
     parser::end(input);
     Ok(())
+}
+
+pub(crate) fn elements_parser(input: &mut Stream) -> winnow::Result<Vec<Element>> {
+    parser::begin(input, "elements");
+
+    let mut elements = Vec::new();
+    loop {
+        let element = element_parser.parse_next(input)?;
+        elements.push(element);
+        if matches!(element, Element::End) {
+            parser::end(input);
+            return Ok(elements);
+        }
+    }
 }
