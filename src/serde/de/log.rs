@@ -2,18 +2,18 @@ mod primitive;
 
 #[derive(Debug, Default)]
 pub(crate) struct LogEngine {
-    parsers: Vec<&'static str>,
+    stages: Vec<&'static str>,
     offset: usize,
     before: Vec<u8>,
 }
 
 impl LogEngine {
-    pub(crate) fn begin(&mut self, parser: &'static str) {
-        self.parsers.push(parser);
+    pub(crate) fn begin(&mut self, stage: &'static str) {
+        self.stages.push(stage);
     }
 
     pub(crate) fn end(&mut self) {
-        self.parsers.pop();
+        self.stages.pop();
     }
 
     fn update(&mut self, byte: u8) {
@@ -58,7 +58,7 @@ impl LogEngine {
 
         // Parsers
         print!("  ");
-        println!("{}", self.parsers.join("/"));
+        println!("{}", self.stages.join("/"));
 
         // Message
         println!("    \x1b[93m{content}\x1b[0m  ");

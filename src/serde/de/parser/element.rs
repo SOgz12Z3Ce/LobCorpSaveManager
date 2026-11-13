@@ -1,6 +1,9 @@
-use crate::serde::{de::Stream, raw::element::Element};
+use crate::serde::{
+    de::{Stream, parser},
+    raw::element::Element,
+};
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
-    let _ = input;
+    parser::prologue(input, "element");
     todo!()
 }

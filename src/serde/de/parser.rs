@@ -1,6 +1,8 @@
 mod element;
 mod top;
 
+use std::{mem::DropGuard, ops::DerefMut};
+
 use winnow::Parser;
 
 #[cfg(feature = "log")]
@@ -13,14 +15,16 @@ use crate::serde::{
     raw::File,
 };
 
-fn begin(_input: &mut Stream, _parser: &'static str) {
+fn prologue<'a, 'b>(
+    input: &'a mut Stream<'b>,
+    stage: &'static str,
+) -> impl DerefMut<Target = &'a mut Stream<'b>> {
     #[cfg(feature = "log")]
-    _input.state.log_engine.begin(_parser);
-}
-
-fn end(_input: &mut Stream) {
-    #[cfg(feature = "log")]
-    _input.state.log_engine.end();
+    input.state.log_engine.begin(stage);
+    DropGuard::new(input, move |input| {
+        #[cfg(feature = "log")]
+        input.state.log_engine.end();
+    })
 }
 
 #[cfg(not(feature = "log"))]
@@ -47,11 +51,10 @@ where
 }
 
 pub(crate) fn parser(input: &mut Stream) -> winnow::Result<File> {
-    begin(input, "main");
+    let mut input = prologue(input, "main");
 
-    magic_parser.parse_next(input)?;
-    let elements = elements_parser.parse_next(input)?;
+    magic_parser.parse_next(&mut input)?;
+    let elements = elements_parser.parse_next(&mut input)?;
 
-    end(input);
     Ok(File::new(elements))
 }
