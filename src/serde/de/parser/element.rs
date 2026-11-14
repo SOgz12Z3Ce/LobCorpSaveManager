@@ -91,9 +91,9 @@ fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
     let kind = parser::explain(
         &mut input,
         move |input| {
-            let kind = u8.parse_next(input)?;
-            let kind = ElementKind::try_from(kind);
-            kind.map_err(|error| ContextError::from_external_error(input, error))
+            u8.parse_next(input)?
+                .try_into()
+                .map_err(|error| ContextError::from_external_error(input, error))
         },
         "Element kind. Every element is leaded with this tag.",
     )?;
