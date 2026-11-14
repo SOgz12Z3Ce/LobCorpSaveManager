@@ -30,9 +30,7 @@ pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
         ElementKind::UntypedExternalObject => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
-        ElementKind::RuntimeObject => {
-            unimplemented!("this element kind was considered to be non-existent in saves")
-        }
+        ElementKind::RuntimeObject => runtime_object_parser.parse_next(&mut input),
         ElementKind::ExternalObject => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
