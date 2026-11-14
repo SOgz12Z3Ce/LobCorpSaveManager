@@ -9,7 +9,10 @@ use winnow::{
 use crate::serde::{
     de::{
         Stream,
-        parser::{self, element::util::id_parser},
+        parser::{
+            self,
+            element::util::{id_parser, runtime_class_parser},
+        },
     },
     raw::element::{Element, kind::ElementKind},
 };
@@ -106,5 +109,6 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
     let mut input = parser::prologue(input, "runtime object");
 
     let id = id_parser.parse_next(&mut input)?;
+    let class = runtime_class_parser.parse_next(&mut input)?;
     todo!()
 }
