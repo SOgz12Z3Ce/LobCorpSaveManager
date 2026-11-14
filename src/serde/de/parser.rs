@@ -17,13 +17,13 @@ use crate::serde::{
 
 fn prologue<'a, 'b>(
     input: &'a mut Stream<'b>,
-    stage: &'static str,
+    _stage: &'static str,
 ) -> impl DerefMut<Target = &'a mut Stream<'b>> {
     #[cfg(feature = "log")]
-    input.state.log_engine.begin(stage);
-    DropGuard::new(input, move |input| {
+    input.state.log_engine.begin(_stage);
+    DropGuard::new(input, move |_input| {
         #[cfg(feature = "log")]
-        input.state.log_engine.end();
+        _input.state.log_engine.end();
     })
 }
 
