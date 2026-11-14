@@ -7,8 +7,11 @@ use winnow::{
 };
 
 use crate::serde::{
-    de::{Stream, parser},
-    raw::element::{Element, ElementKind},
+    de::{
+        Stream,
+        parser::{self, element::util::id_parser},
+    },
+    raw::element::{Element, kind::ElementKind},
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
@@ -101,4 +104,11 @@ fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
     )?;
 
     Ok(kind)
+}
+
+fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
+    let mut input = parser::prologue(input, "runtime object");
+
+    let id = id_parser.parse_next(&mut input)?;
+    todo!()
 }
