@@ -5,6 +5,7 @@ use crate::error::Error;
 // C# will throw an exception when the casting overflow. So ID should be
 // >= 1 (initial value of generator) and <= i32::MAX (or throw exception when
 // writing).
+#[allow(unused)] // TODO: It will be used someday.
 #[derive(Debug)]
 pub(crate) struct Id(u32);
 
