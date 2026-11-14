@@ -106,7 +106,7 @@ fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
 }
 
 fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
-    let mut input = parser::prologue(input, "runtime object");
+    let mut input = parser::prologue(input, "runtime_object");
 
     let id = id_parser.parse_next(&mut input)?;
     let class = runtime_class_parser.parse_next(&mut input)?;
