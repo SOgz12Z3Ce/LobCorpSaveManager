@@ -1,8 +1,8 @@
+pub(crate) mod element;
+
 use std::fmt::Display;
 
 use crate::serde::raw::element::Element;
-
-pub(crate) mod element;
 
 #[derive(Debug)]
 pub(crate) struct File {
