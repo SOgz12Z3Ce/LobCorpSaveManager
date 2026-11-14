@@ -1,3 +1,4 @@
+pub(crate) mod id;
 pub(crate) mod kind;
 
 #[derive(Debug)]
@@ -26,6 +27,3 @@ pub(crate) enum Element {
     // MethodCall,
     // MethodResponse,
 }
-
-// #[derive(Debug)]
-// pub(crate) Id()

@@ -4,7 +4,7 @@ use winnow::{
     error::{ContextError, FromExternalError},
 };
 
-use crate::serde::{de::Stream, raw::Id};
+use crate::serde::{de::Stream, raw::element::id::Id};
 
 pub fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
     le_u32
