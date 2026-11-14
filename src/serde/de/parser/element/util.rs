@@ -6,7 +6,7 @@ use winnow::{
 
 use crate::serde::{de::Stream, raw::element::id::Id};
 
-pub fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
+pub(crate) fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
     le_u32
         .parse_next(input)?
         .try_into()
