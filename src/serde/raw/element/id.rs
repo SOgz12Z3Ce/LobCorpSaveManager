@@ -25,7 +25,7 @@ impl TryFrom<u32> for Id {
 
 #[cfg(feature = "log")]
 impl Log for Id {
-    fn as_bytes(&self) -> Vec<u8> {
+    fn to_bytes(&self) -> Vec<u8> {
         self.0.to_le_bytes().to_vec()
     }
 

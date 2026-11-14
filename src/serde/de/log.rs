@@ -28,7 +28,7 @@ impl LogEngine {
     where
         V: Log,
     {
-        let bytes = value.as_bytes();
+        let bytes = value.to_bytes();
         let content = value.to_log();
 
         // Header
@@ -89,7 +89,7 @@ impl LogEngine {
 }
 
 pub(crate) trait Log {
-    fn as_bytes(&self) -> Vec<u8>;
+    fn to_bytes(&self) -> Vec<u8>;
 
     fn to_log(&self) -> String;
 }

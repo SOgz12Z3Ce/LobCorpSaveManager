@@ -3,7 +3,7 @@ use itertools::Itertools;
 use crate::serde::de::log::Log;
 
 impl Log for &[u8] {
-    fn as_bytes(&self) -> Vec<u8> {
+    fn to_bytes(&self) -> Vec<u8> {
         self.to_vec()
     }
 
@@ -17,7 +17,7 @@ impl Log for &[u8] {
 }
 
 impl Log for i32 {
-    fn as_bytes(&self) -> Vec<u8> {
+    fn to_bytes(&self) -> Vec<u8> {
         self.to_le_bytes().to_vec()
     }
 

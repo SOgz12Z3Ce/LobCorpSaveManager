@@ -69,7 +69,7 @@ impl TryFrom<u8> for ElementKind {
 
 #[cfg(feature = "log")]
 impl Log for ElementKind {
-    fn as_bytes(&self) -> Vec<u8> {
+    fn to_bytes(&self) -> Vec<u8> {
         vec![*self as u8]
     }
 
