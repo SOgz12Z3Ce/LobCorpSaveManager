@@ -26,7 +26,9 @@ pub(crate) enum ElementKind {
     ArrayOfObject,
     ArrayOfString,
     Method,
+    #[strum(to_string = "_Unknown4")]
     Unknown4, // Rename from '_Unknown4' @04001080
+    #[strum(to_string = "_Unknown5")]
     Unknown5, // Rename from '_Unknown5' @04001081
     MethodCall,
     MethodResponse,
