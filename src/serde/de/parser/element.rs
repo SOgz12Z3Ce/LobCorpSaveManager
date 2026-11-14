@@ -51,9 +51,7 @@ pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
         ElementKind::NullValue => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
-        ElementKind::End => {
-            unimplemented!("this element kind was considered to be non-existent in saves")
-        }
+        ElementKind::End => Ok(Element::End),
         ElementKind::Assembly => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
@@ -87,7 +85,7 @@ pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
         ElementKind::MethodResponse => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
-    };
+    }
 }
 
 fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
