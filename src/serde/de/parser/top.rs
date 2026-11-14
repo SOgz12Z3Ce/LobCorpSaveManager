@@ -47,9 +47,10 @@ pub(crate) fn elements_parser(input: &mut Stream) -> winnow::Result<Vec<Element>
     let mut elements = Vec::new();
     loop {
         let element = element_parser.parse_next(&mut input)?;
-        elements.push(element);
         if matches!(element, Element::End) {
+            elements.push(element);
             return Ok(elements);
         }
+        elements.push(element);
     }
 }
