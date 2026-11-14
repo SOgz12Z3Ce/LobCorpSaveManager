@@ -39,17 +39,14 @@ impl LogEngine {
         for byte in &self.before {
             print!(" \x1b[90m{byte:02X}\x1b[0m");
         }
-        for byte in &bytes[..bytes.len() - 1] {
+        for byte in bytes {
             print!(" \x1b[93m{:02X}\x1b[0m", byte);
-            self.update(*byte);
+            self.update(byte);
             if self.offset % 16 == 0 {
                 println!("");
                 print!("{:08X}", self.offset / 16 * 16);
             }
         }
-        let last_byte = bytes[bytes.len() - 1];
-        print!(" \x1b[93m{:02X}\x1b[0m", last_byte);
-        self.update(last_byte);
         for _ in 0..(16 - self.offset % 16) {
             print!(" \x1b[90m??\x1b[0m");
         }
