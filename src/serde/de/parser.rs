@@ -28,24 +28,28 @@ fn prologue<'a, 'b>(
 }
 
 #[cfg(not(feature = "log"))]
-fn parse_next<'a, 'b, P, O, E>(input: &'a mut Stream<'b>, mut parser: P, _: &str) -> Result<O, E>
+fn explain<'b, F, O>(
+    input: &mut Stream<'b>,
+    process: F,
+    _explaination: &'static str,
+) -> winnow::Result<O>
 where
-    P: Parser<Stream<'b>, O, E>,
+    F: FnOnce(&mut Stream<'b>) -> winnow::Result<O>,
 {
-    parser.parse_next(input)
+    process(input)
 }
 
 #[cfg(feature = "log")]
-fn parse_next<'a, 'b, P, O, E>(
-    input: &'a mut Stream<'b>,
-    mut parser: P,
-    explaination: &str,
-) -> Result<O, E>
+fn explain<'b, F, O>(
+    input: &mut Stream<'b>,
+    process: F,
+    explaination: &'static str,
+) -> winnow::Result<O>
 where
-    P: Parser<Stream<'b>, O, E>,
+    F: FnOnce(&mut Stream<'b>) -> winnow::Result<O>,
     O: Log,
 {
-    let value = parser.parse_next(input)?;
+    let value = process(input)?;
     input.state.log_engine.log(&value, explaination);
     Ok(value)
 }

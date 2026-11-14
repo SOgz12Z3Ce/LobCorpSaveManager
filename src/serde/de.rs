@@ -1,5 +1,5 @@
 #[cfg(feature = "log")]
-mod log;
+pub(crate) mod log;
 mod parser;
 
 use winnow::{Parser, Stateful, token::rest};

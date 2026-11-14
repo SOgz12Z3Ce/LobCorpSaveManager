@@ -1,7 +1,11 @@
+use strum_macros::Display;
+
 use crate::error::Error;
+#[cfg(feature = "log")]
+use crate::serde::de::log::Log;
 
 // BinaryElement @0200045C
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Display)]
 pub(crate) enum ElementKind {
     Header,
     RefTypeObject,
@@ -58,6 +62,17 @@ impl TryFrom<u8> for ElementKind {
             22 => Ok(Self::MethodResponse),
             _ => Err(Error::InvalidElementKind(value)),
         }
+    }
+}
+
+#[cfg(feature = "log")]
+impl Log for ElementKind {
+    fn as_bytes(&self) -> Vec<u8> {
+        vec![*self as u8]
+    }
+
+    fn to_log(&self) -> String {
+        self.to_string()
     }
 }
 

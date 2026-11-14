@@ -11,30 +11,30 @@ use crate::serde::{
 pub(crate) fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
     let mut input = parser::prologue(input, "magic");
 
-    parser::parse_next(
+    parser::explain(
         &mut input,
-        literal(0x00),
+        move |input| literal(0x00).parse_next(input),
         "Magic number. Byte '0x00' at offset '0h'.",
     )?;
 
-    parser::parse_next(
+    parser::explain(
         &mut input,
-        le_i32.verify(|i| *i == 1),
+        move |input| le_i32.verify(|i| *i == 1).parse_next(input),
         "Magic number. Little endian 32-bit signed '1' at offset '1h'.",
     )?;
-    parser::parse_next(
+    parser::explain(
         &mut input,
-        le_i32.verify(|i| *i == -1),
+        move |input| le_i32.verify(|i| *i == -1).parse_next(input),
         "Flag for having a header. Little endian 32-bit signed '2' for having a header, '-1' for not. Saves never have any header.",
     )?;
-    parser::parse_next(
+    parser::explain(
         &mut input,
-        le_i32.verify(|i| *i == 1),
+        move |input| le_i32.verify(|i| *i == 1).parse_next(input),
         "Magic number. Little endian 32-bit signed '1' at offset '9h'.",
     )?;
-    parser::parse_next(
+    parser::explain(
         &mut input,
-        le_i32.verify(|i| *i == 0),
+        move |input| le_i32.verify(|i| *i == 0).parse_next(input),
         "Magic number. Little endian 32-bit signed '0' at offset 'Dh'.",
     )?;
 
