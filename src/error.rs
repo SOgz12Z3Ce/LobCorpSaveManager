@@ -18,6 +18,9 @@ pub(crate) enum Error {
 
     #[error("element kind '{0}' is invalid")]
     InvalidElementKind(u8),
+
+    #[error("id '{0}' is invalid")]
+    InvalidID(u32),
 }
 
 impl<I> From<ParseError<I, ContextError>> for Error {
