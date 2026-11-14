@@ -15,6 +15,9 @@ pub(crate) enum Error {
 
     #[error("I/O failed: '{0}'")]
     IO(#[from] std::io::Error),
+
+    #[error("element kind '{0}' is invalid")]
+    InvalidElementKind(u8),
 }
 
 impl<I> From<ParseError<I, ContextError>> for Error {
