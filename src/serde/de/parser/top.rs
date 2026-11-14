@@ -14,28 +14,28 @@ pub(crate) fn magic_parser(input: &mut Stream) -> winnow::Result<()> {
     parser::parse_next(
         &mut input,
         literal(0x00),
-        "Magic number, byte '0x00' at offset 0h.",
+        "Magic number. Byte '0x00' at offset '0h'.",
     )?;
 
     parser::parse_next(
         &mut input,
         le_i32.verify(|i| *i == 1),
-        "Magic number, little endian 32-bit signed '1' at offset 1h.",
+        "Magic number. Little endian 32-bit signed '1' at offset '1h'.",
     )?;
     parser::parse_next(
         &mut input,
         le_i32.verify(|i| *i == -1),
-        "Has header flag, little endian 32-bit signed '2' for has one, '-1' for doesn't have one. Saves always don't have headers.",
+        "Flag for having a header. Little endian 32-bit signed '2' for having a header, '-1' for not. Saves never have any header.",
     )?;
     parser::parse_next(
         &mut input,
         le_i32.verify(|i| *i == 1),
-        "Magic number, little endian 32-bit signed '1' at offset 9h.",
+        "Magic number. Little endian 32-bit signed '1' at offset '9h'.",
     )?;
     parser::parse_next(
         &mut input,
         le_i32.verify(|i| *i == 0),
-        "Magic number, little endian 32-bit signed '0' at offset Dh.",
+        "Magic number. Little endian 32-bit signed '0' at offset 'Dh'.",
     )?;
 
     Ok(())
