@@ -26,8 +26,8 @@ pub(crate) enum ElementKind {
     ArrayOfObject,
     ArrayOfString,
     Method,
-    _Unknown4,
-    _Unknown5,
+    Unknown4, // Rename from '_Unknown4' @04001080
+    Unknown5, // Rename from '_Unknown5' @04001081
     MethodCall,
     MethodResponse,
 }
@@ -56,8 +56,8 @@ impl TryFrom<u8> for ElementKind {
             16 => Ok(Self::ArrayOfObject),
             17 => Ok(Self::ArrayOfString),
             18 => Ok(Self::Method),
-            19 => Ok(Self::_Unknown4),
-            20 => Ok(Self::_Unknown5),
+            19 => Ok(Self::Unknown4),
+            20 => Ok(Self::Unknown5),
             21 => Ok(Self::MethodCall),
             22 => Ok(Self::MethodResponse),
             _ => Err(Error::InvalidElementKind(value)),
