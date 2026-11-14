@@ -128,6 +128,7 @@ impl TryFrom<u8> for PrimitiveClass {
     }
 }
 
+#[cfg(feature = "log")]
 impl Log for PrimitiveClass {
     fn to_bytes(&self) -> Vec<u8> {
         match self {
