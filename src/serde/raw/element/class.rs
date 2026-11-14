@@ -34,7 +34,7 @@ pub(crate) enum Class {
 
 impl Class {
     // From the constructor of BinaryCommon (@06002AE8).
-    fn primitive(code: u8) -> Result<Self, Error> {
+    pub(crate) fn primitive(code: u8) -> Result<Self, Error> {
         match code {
             1 => Ok(Self::Bool),
             2 => Ok(Self::Byte),
@@ -57,7 +57,7 @@ impl Class {
         }
     }
 
-    fn runtime(name: &str) -> Result<Self, Error> {
+    pub(crate) fn runtime(name: &str) -> Result<Self, Error> {
         match name {
             "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]" => {
                 Ok(Self::Dictinoary)
