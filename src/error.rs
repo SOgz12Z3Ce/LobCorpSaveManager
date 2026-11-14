@@ -21,6 +21,12 @@ pub(crate) enum Error {
 
     #[error("id '{0}' is invalid")]
     InvalidID(u32),
+    
+    #[error("primitive class '{0}' is invalid")]
+    InvalidPrimitiveClass(u8),
+
+    #[error("runtime class '{0}' is invalid")]
+    InvalidRuntimeClass(String),
 }
 
 impl<I> From<ParseError<I, ContextError>> for Error {
