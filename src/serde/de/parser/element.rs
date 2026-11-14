@@ -10,7 +10,7 @@ use crate::serde::{
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
-    parser::prologue(input, "element");
+    let mut input = parser::prologue(input, "element");
 
     element_kind_parser.parse_next(input)?;
 
@@ -18,10 +18,10 @@ pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
 }
 
 fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
-    parser::prologue(input, "kind");
+    let mut input = parser::prologue(input, "kind");
 
     let kind = parser::explain(
-        input,
+        &mut input,
         move |input| {
             let kind = u8.parse_next(input)?;
             let kind = ElementKind::try_from(kind);
