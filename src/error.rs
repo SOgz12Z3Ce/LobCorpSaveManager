@@ -30,6 +30,9 @@ pub(crate) enum Error {
 
     #[error("count '{0}' is invalid")]
     InvalidCount(i32),
+    
+    #[error("field kind '{0}' is invalid")]
+    InvalidFieldKind(u8),
 }
 
 impl<I> From<ParseError<I, ContextError>> for Error {
