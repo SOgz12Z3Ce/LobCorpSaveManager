@@ -7,7 +7,7 @@ use winnow::{
 
 use crate::serde::{
     de::{Stream, parser},
-    raw::element::{class::Class, count::Count, id::Id},
+    raw::element::{class::Class, count::Count, id::Id, leb128_str::Leb128Str},
 };
 
 pub(crate) fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
@@ -31,8 +31,9 @@ pub(crate) fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> 
     parser::explain(
         &mut input,
         move |input| {
-            let name = leb128_string_parser.parse_next(input)?;
-            Class::runtime(name).map_err(|error| ContextError::from_external_error(input, error))
+            let name = leb128_str_parser.parse_next(input)?;
+            Class::runtime(name.into())
+                .map_err(|error| ContextError::from_external_error(input, error))
         },
         "Runtime class. LEB128 encoded C# type full name.",
     )
@@ -43,12 +44,31 @@ macro_rules! count_wrapper {
         pub(crate) fn $func(input: &mut Stream) -> winnow::Result<Count> {
             let mut input = parser::prologue(input, $stage);
 
-            parser::explain(&mut input, move |input| count_parser.parse_next(input), $explaination)
+            parser::explain(
+                &mut input,
+                move |input| count_parser.parse_next(input),
+                $explaination,
+            )
+        }
+    };
+}
+
+macro_rules! leb128_str_wrapper {
+    ($func:ident($stage:literal: $explaination:literal)) => {
+        pub(crate) fn $func<'b>(input: &mut Stream<'b>) -> winnow::Result<Leb128Str<'b>> {
+            let mut input = parser::prologue(input, $stage);
+
+            parser::explain(
+                &mut input,
+                move |input| leb128_str_parser.parse_next(input),
+                $explaination,
+            )
         }
     };
 }
 
 count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
+leb128_str_wrapper!(field_name("field_name": "Runtime object field name. LEB128 encoded string."));
 
 fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
     let count = le_i32.parse_next(input)?;
@@ -59,13 +79,7 @@ fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
     }
 }
 
-macro_rules! leb128_string_wrapper {
-    () => {
-        
-    };
-}
-
-fn leb128_string_parser<'b>(input: &mut Stream<'b>) -> winnow::Result<&'b str> {
+fn leb128_str_parser<'b>(input: &mut Stream<'b>) -> winnow::Result<Leb128Str<'b>> {
     let length = {
         let mut buffer = 0u64;
         let mut shift = 0usize;
@@ -100,5 +114,9 @@ fn leb128_string_parser<'b>(input: &mut Stream<'b>) -> winnow::Result<&'b str> {
     }
 
     let content = take(length as usize).parse_next(input)?;
-    str::from_utf8(content).map_err(|e| ContextError::from_external_error(input, e))
+    let content = str::from_utf8(content);
+    match content {
+        Ok(content) => Ok(content.into()),
+        Err(error) => Err(ContextError::from_external_error(input, error)),
+    }
 }
