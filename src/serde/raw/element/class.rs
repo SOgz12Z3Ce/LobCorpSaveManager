@@ -17,9 +17,9 @@ impl Class {
         Ok(Self::Primitive(class))
     }
 
-    pub(crate) fn runtime(name: &str) -> Result<Self, Error> {
+    pub(crate) fn runtime(name: Leb128Str) -> Result<Self, Error> {
         let class = RuntimeClass::try_from_full_name(name)
-            .map_err(|_| Error::InvalidRuntimeClass(name.to_owned()))?;
+            .map_err(|_| Error::InvalidRuntimeClass(name.to_string()))?;
         Ok(Self::Runtime(class))
     }
 }
@@ -188,29 +188,30 @@ impl RuntimeClass {
     ];
 
     fn full_name(&self) -> Leb128Str<'static> {
-        match self {
-            Self::Dictinoary => Leb128Str::from(
-                "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
-            ),
-            Self::GenericEqualityComparer => Leb128Str::from(
-                "System.Collections.Generic.GenericEqualityComparer`1[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
-            ),
-            Self::KeyValuePairArray => Leb128Str::from(
-                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][]",
-            ),
-            Self::KeyValuePair => Leb128Str::from(
-                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
-            ),
-        }
+        let name = match self {
+            Self::Dictinoary => {
+                "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+            }
+            Self::GenericEqualityComparer => {
+                "System.Collections.Generic.GenericEqualityComparer`1[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+            }
+            Self::KeyValuePairArray => {
+                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][]"
+            }
+            Self::KeyValuePair => {
+                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+            }
+        };
+        Leb128Str::from(name)
     }
 
-    fn try_from_full_name(full_name: &str) -> Result<Self, Error> {
+    fn try_from_full_name(full_name: Leb128Str) -> Result<Self, Error> {
         for class in Self::ALL {
-            if <&str>::from(class.full_name()) == full_name {
+            if class.full_name() == full_name {
                 return Ok(class);
             }
         }
-        Err(Error::InvalidRuntimeClass(full_name.to_owned()))
+        Err(Error::InvalidRuntimeClass(full_name.to_string()))
     }
 }
 

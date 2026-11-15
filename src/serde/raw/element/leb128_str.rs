@@ -1,7 +1,7 @@
 #[cfg(feature = "log")]
 use crate::serde::de::log::Log;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub(crate) struct Leb128Str<'a>(&'a str);
 
 impl<'a> From<&'a str> for Leb128Str<'a> {
@@ -13,6 +13,12 @@ impl<'a> From<&'a str> for Leb128Str<'a> {
 impl<'a> From<Leb128Str<'a>> for &'a str {
     fn from(value: Leb128Str<'a>) -> Self {
         value.0
+    }
+}
+
+impl<'a> ToString for Leb128Str<'a> {
+    fn to_string(&self) -> String {
+        self.0.to_owned()
     }
 }
 
