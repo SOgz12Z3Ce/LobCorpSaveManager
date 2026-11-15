@@ -7,10 +7,7 @@ use winnow::{
 
 use crate::serde::{
     de::{Stream, parser},
-    raw::{
-        count::Count,
-        element::{class::Class, id::Id, leb128_str::Leb128Str},
-    },
+    raw::{class::Class, count::Count, id::Id, leb128_str::Leb128Str},
 };
 
 pub(crate) fn id_parser(input: &mut Stream) -> winnow::Result<Id> {

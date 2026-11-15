@@ -2,7 +2,7 @@ use strum_macros::Display;
 
 #[cfg(feature = "log")]
 use crate::serde::de::log::Log;
-use crate::{error::Error, serde::raw::element::leb128_str::Leb128Str};
+use crate::{error::Error, serde::raw::leb128_str::Leb128Str};
 
 // C# class.
 #[derive(Debug, Clone, Copy)]

@@ -17,7 +17,10 @@ use crate::serde::{
             },
         },
     },
-    raw::element::{Element, kind::ElementKind, leb128_str::Leb128Str},
+    raw::{
+        element::{Element, kind::ElementKind},
+        leb128_str::Leb128Str,
+    },
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
