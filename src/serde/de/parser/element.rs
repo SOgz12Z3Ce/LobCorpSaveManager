@@ -13,7 +13,7 @@ use crate::serde::{
         parser::{
             self,
             element::util::{
-                field_count_parser, field_name_parser, id_parser, runtime_class_parser,
+                field_count_parser, field_name_parser, id_parser, runtime_object_class_parser,
             },
         },
     },
@@ -112,7 +112,7 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
     let mut input = parser::prologue(input, "runtime_object");
 
     let id = id_parser.parse_next(&mut input)?;
-    let class = runtime_class_parser.parse_next(&mut input)?;
+    let class = runtime_object_class_parser.parse_next(&mut input)?;
     let field_count = field_count_parser.parse_next(&mut input)?;
     let field_names: Vec<Leb128Str> =
         repeat(usize::from(field_count), field_name_parser).parse_next(&mut input)?;

@@ -25,50 +25,36 @@ pub(crate) fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
     )
 }
 
-pub(crate) fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> {
-    let mut input = parser::prologue(input, "class");
+macro_rules! wrapper {
+    ($name:ident: $parser:ident -> $result:ty) => {
+        macro_rules! $name {
+            ($func:ident($stage:literal: $explaination:literal)) => {
+                pub(crate) fn $func<'a, 'b>(input: &'a mut Stream<'b>) -> winnow::Result<$result> {
+                    let mut input = parser::prologue(input, $stage);
 
-    parser::explain(
-        &mut input,
-        move |input| {
-            let name = leb128_str_parser.parse_next(input)?;
-            Class::runtime(name.into())
-                .map_err(|error| ContextError::from_external_error(input, error))
-        },
-        "Runtime class. LEB128 encoded C# type full name.",
-    )
-}
-
-macro_rules! count_wrapper {
-    ($func:ident($stage:literal: $explaination:literal)) => {
-        pub(crate) fn $func(input: &mut Stream) -> winnow::Result<Count> {
-            let mut input = parser::prologue(input, $stage);
-
-            parser::explain(
-                &mut input,
-                move |input| count_parser.parse_next(input),
-                $explaination,
-            )
+                    parser::explain(
+                        &mut input,
+                        move |input| $parser.parse_next(input),
+                        $explaination,
+                    )
+                }
+            };
         }
     };
 }
 
-macro_rules! leb128_str_wrapper {
-    ($func:ident($stage:literal: $explaination:literal)) => {
-        pub(crate) fn $func<'b>(input: &mut Stream<'b>) -> winnow::Result<Leb128Str<'b>> {
-            let mut input = parser::prologue(input, $stage);
+wrapper!(runtime_wrapper: runtime_class_parser -> Class);
+wrapper!(count_wrapper: count_parser -> Count);
+wrapper!(leb128_str_wrapper: leb128_str_parser -> Leb128Str<'b>);
 
-            parser::explain(
-                &mut input,
-                move |input| leb128_str_parser.parse_next(input),
-                $explaination,
-            )
-        }
-    };
-}
-
+runtime_wrapper!(runtime_object_class_parser("class": "Runtime class. LEB128 encoded C# type full name."));
 count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
 leb128_str_wrapper!(field_name_parser("field_name": "Runtime object field name. LEB128 encoded string."));
+
+fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> {
+    let name = leb128_str_parser.parse_next(input)?;
+    Class::runtime(name).map_err(|error| ContextError::from_external_error(input, error))
+}
 
 fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
     let count = le_i32.parse_next(input)?;
