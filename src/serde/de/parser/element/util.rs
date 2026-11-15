@@ -34,7 +34,7 @@ pub(crate) fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> 
             let name = leb128_string_parser.parse_next(input)?;
             Class::runtime(name).map_err(|error| ContextError::from_external_error(input, error))
         },
-        "Runtime object class. LEB128 encoded C# type full name.",
+        "Runtime class. LEB128 encoded C# type full name.",
     )
 }
 
