@@ -1,3 +1,4 @@
+pub(crate) mod count;
 pub(crate) mod element;
 
 use std::fmt::Display;
