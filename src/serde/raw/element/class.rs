@@ -12,7 +12,6 @@ pub(crate) enum Class {
 }
 
 impl Class {
-    // From the constructor of BinaryCommon (@06002AE8).
     pub(crate) fn primitive(code: u8) -> Result<Self, Error> {
         let class = PrimitiveClass::try_from(code)?;
         Ok(Self::Primitive(class))
@@ -104,6 +103,7 @@ pub(crate) enum PrimitiveClass {
 impl TryFrom<u8> for PrimitiveClass {
     type Error = Error;
 
+    // From the constructor of BinaryCommon (@06002AE8).
     fn try_from(value: u8) -> Result<Self, Self::Error> {
         match value {
             1 => Ok(Self::Bool),
