@@ -43,7 +43,7 @@ macro_rules! count_wrapper {
         pub(crate) fn $func(input: &mut Stream) -> winnow::Result<Count> {
             let mut input = parser::prologue(input, $stage);
 
-            parser::explain(&mut input, move |input| count_parser(input), $explaination)
+            parser::explain(&mut input, move |input| count_parser.parse_next(input), $explaination)
         }
     };
 }
@@ -57,6 +57,12 @@ fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
     } else {
         Count::try_from(count).map_err(|error| ContextError::from_external_error(input, error))
     }
+}
+
+macro_rules! leb128_string_wrapper {
+    () => {
+        
+    };
 }
 
 fn leb128_string_parser<'b>(input: &mut Stream<'b>) -> winnow::Result<&'b str> {
