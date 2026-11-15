@@ -39,6 +39,31 @@ pub(crate) fn field_kind_parser(input: &mut Stream) -> winnow::Result<FieldKind>
     )
 }
 
+pub(crate) fn class_parser_of<'b>(kind: FieldKind) -> impl Parser<Stream<'b>, Class, ContextError> {
+    match kind {
+        FieldKind::PrimitiveType => field_primitive_class_parser,
+        FieldKind::String => {
+            unimplemented!("this field kind was considered to be non-existent in saves")
+        }
+        FieldKind::ObjectType => {
+            unimplemented!("this field kind was considered to be non-existent in saves")
+        }
+        FieldKind::RuntimeType => field_runtime_class_parser,
+        FieldKind::GenericType => {
+            unimplemented!("this field kind was considered to be non-existent in saves")
+        }
+        FieldKind::ArrayOfObject => {
+            unimplemented!("this field kind was considered to be non-existent in saves")
+        }
+        FieldKind::ArrayOfString => {
+            unimplemented!("this field kind was considered to be non-existent in saves")
+        }
+        FieldKind::ArrayOfPrimitiveType => {
+            unimplemented!("this field kind was considered to be non-existent in saves")
+        }
+    }
+}
+
 macro_rules! wrapper {
     ($name:ident: $parser:ident -> $result:ty) => {
         macro_rules! $name {
@@ -57,13 +82,21 @@ macro_rules! wrapper {
     };
 }
 
-wrapper!(runtime_wrapper: runtime_class_parser -> Class);
+wrapper!(primitive_class_parser: primitive_class_parser -> Class);
+wrapper!(runtime_class_wrapper: runtime_class_parser -> Class);
 wrapper!(count_wrapper: count_parser -> Count);
 wrapper!(leb128_str_wrapper: leb128_str_parser -> Leb128Str<'b>);
 
-runtime_wrapper!(runtime_object_class_parser("class": "Runtime class. LEB128 encoded C# type full name."));
+primitive_class_parser!(field_primitive_class_parser("field_class": "Runtime object field class. This is a primitive class."));
+runtime_class_wrapper!(runtime_object_class_parser("class": "Runtime object class. LEB128 encoded C# type full name."));
+runtime_class_wrapper!(field_runtime_class_parser("class": "Runtime object field class. This is a runtime class. LEB128 encoded C# type full name."));
 count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
 leb128_str_wrapper!(field_name_parser("field_name": "Runtime object field name. LEB128 encoded string."));
+
+fn primitive_class_parser(input: &mut Stream) -> winnow::Result<Class> {
+    let code = u8.parse_next(input)?;
+    Class::primitive(code).map_err(|error| ContextError::from_external_error(input, error))
+}
 
 fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> {
     let name = leb128_str_parser.parse_next(input)?;

@@ -132,29 +132,23 @@ impl TryFrom<u8> for PrimitiveClass {
 impl Log for PrimitiveClass {
     fn to_bytes(&self) -> Vec<u8> {
         match self {
-            Self::Bool => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Byte => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Char => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Decimal => {
-                unimplemented!("this class was considered to be non-existent in saves")
-            }
-            Self::Double => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Short => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Int => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Long => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::SByte => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Float => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::TimeSpan => {
-                unimplemented!("this class was considered to be non-existent in saves")
-            }
-            Self::DateTime => {
-                unimplemented!("this class was considered to be non-existent in saves")
-            }
-            Self::UShort => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::UInt => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::ULong => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::Null => unimplemented!("this class was considered to be non-existent in saves"),
-            Self::String => unimplemented!("this class was considered to be non-existent in saves"),
+            Self::Bool => vec![0x01],
+            Self::Byte => vec![0x02],
+            Self::Char => vec![0x03],
+            Self::Decimal => vec![0x05],
+            Self::Double => vec![0x06],
+            Self::Short => vec![0x07],
+            Self::Int => vec![0x08],
+            Self::Long => vec![0x09],
+            Self::SByte => vec![0x0A],
+            Self::Float => vec![0x0B],
+            Self::TimeSpan => vec![0x0C],
+            Self::DateTime => vec![0x0D],
+            Self::UShort => vec![0x0E],
+            Self::UInt => vec![0x0F],
+            Self::ULong => vec![0x10],
+            Self::Null => vec![0x11],
+            Self::String => vec![0x12],
         }
     }
 
