@@ -27,6 +27,9 @@ pub(crate) enum Error {
 
     #[error("runtime class '{0}' is invalid")]
     InvalidRuntimeClass(String),
+
+    #[error("count '{0}' is invalid")]
+    InvalidCount(i32),
 }
 
 impl<I> From<ParseError<I, ContextError>> for Error {

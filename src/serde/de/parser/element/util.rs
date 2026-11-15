@@ -7,7 +7,7 @@ use winnow::{
 
 use crate::serde::{
     de::{Stream, parser},
-    raw::element::{class::Class, id::Id},
+    raw::element::{class::Class, count::Count, id::Id},
 };
 
 pub(crate) fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
@@ -38,12 +38,24 @@ pub(crate) fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> 
     )
 }
 
-pub(crate) fn count_parser(input: &mut Stream) -> winnow::Result<usize> {
+macro_rules! count_wrapper {
+    ($func:ident($stage:literal: $explaination:literal)) => {
+        pub(crate) fn $func(input: &mut Stream) -> winnow::Result<Count> {
+            let mut input = parser::prologue(input, $stage);
+
+            parser::explain(&mut input, move |input| count_parser(input), $explaination)
+        }
+    };
+}
+
+count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
+
+fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
     let count = le_i32.parse_next(input)?;
     if count < 0 {
         Err(ContextError::from_input(input))
     } else {
-        Ok(count as usize)
+        Count::try_from(count).map_err(|error| ContextError::from_external_error(input, error))
     }
 }
 

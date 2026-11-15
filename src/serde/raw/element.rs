@@ -1,4 +1,5 @@
 pub(crate) mod class;
+pub(crate) mod count;
 pub(crate) mod id;
 pub(crate) mod kind;
 
