@@ -68,7 +68,7 @@ macro_rules! leb128_str_wrapper {
 }
 
 count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
-leb128_str_wrapper!(field_name("field_name": "Runtime object field name. LEB128 encoded string."));
+leb128_str_wrapper!(field_name_parser("field_name": "Runtime object field name. LEB128 encoded string."));
 
 fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
     let count = le_i32.parse_next(input)?;
