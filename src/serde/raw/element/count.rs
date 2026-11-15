@@ -18,6 +18,12 @@ impl TryFrom<i32> for Count {
     }
 }
 
+impl From<Count> for usize {
+    fn from(value: Count) -> Self {
+        value.0
+    }
+}
+
 #[cfg(feature = "log")]
 impl Log for Count {
     fn to_bytes(&self) -> Vec<u8> {

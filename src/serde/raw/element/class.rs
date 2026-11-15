@@ -1,8 +1,8 @@
 use strum_macros::Display;
 
-use crate::error::Error;
 #[cfg(feature = "log")]
 use crate::serde::de::log::Log;
+use crate::{error::Error, serde::raw::element::leb128_str::Leb128Str};
 
 // C# class.
 #[derive(Debug, Clone, Copy)]
@@ -187,26 +187,26 @@ impl RuntimeClass {
         Self::KeyValuePair,
     ];
 
-    fn full_name(&self) -> &'static str {
+    fn full_name(&self) -> Leb128Str {
         match self {
-            Self::Dictinoary => {
-                "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-            }
-            Self::GenericEqualityComparer => {
-                "System.Collections.Generic.GenericEqualityComparer`1[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-            }
-            Self::KeyValuePairArray => {
-                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][]"
-            }
-            Self::KeyValuePair => {
-                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
-            }
+            Self::Dictinoary => Leb128Str::from(
+                "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
+            ),
+            Self::GenericEqualityComparer => Leb128Str::from(
+                "System.Collections.Generic.GenericEqualityComparer`1[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
+            ),
+            Self::KeyValuePairArray => Leb128Str::from(
+                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][]",
+            ),
+            Self::KeyValuePair => Leb128Str::from(
+                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
+            ),
         }
     }
 
     fn try_from_full_name(full_name: &str) -> Result<Self, Error> {
         for class in Self::ALL {
-            if class.full_name() == full_name {
+            if <&str>::from(class.full_name()) == full_name {
                 return Ok(class);
             }
         }
@@ -217,24 +217,7 @@ impl RuntimeClass {
 #[cfg(feature = "log")]
 impl Log for RuntimeClass {
     fn to_bytes(&self) -> Vec<u8> {
-        let string = self.full_name().to_owned().into_bytes();
-        let mut length = string.len();
-        let mut length = {
-            let mut bytes = Vec::new();
-            loop {
-                let section = (length & 0b01111111) as u8;
-                length >>= 7;
-                let end = length == 0;
-                if end {
-                    bytes.push(section);
-                    break bytes;
-                } else {
-                    bytes.push(section | 0b10000000);
-                }
-            }
-        };
-        length.extend(string);
-        length
+        self.full_name().to_bytes()
     }
 
     fn to_log(&self) -> String {

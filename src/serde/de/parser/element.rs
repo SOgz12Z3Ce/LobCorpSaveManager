@@ -3,6 +3,7 @@ mod util;
 use winnow::{
     Parser,
     binary::u8,
+    combinator::repeat,
     error::{ContextError, FromExternalError},
 };
 
@@ -11,10 +12,12 @@ use crate::serde::{
         Stream,
         parser::{
             self,
-            element::util::{field_count_parser, id_parser, runtime_class_parser},
+            element::util::{
+                field_count_parser, field_name_parser, id_parser, runtime_class_parser,
+            },
         },
     },
-    raw::element::{Element, kind::ElementKind},
+    raw::element::{Element, kind::ElementKind, leb128_str::Leb128Str},
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
@@ -111,5 +114,8 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
     let id = id_parser.parse_next(&mut input)?;
     let class = runtime_class_parser.parse_next(&mut input)?;
     let field_count = field_count_parser.parse_next(&mut input)?;
+    let field_names: Vec<Leb128Str> =
+        repeat(usize::from(field_count), field_name_parser).parse_next(&mut input)?;
+
     todo!()
 }
