@@ -8,13 +8,10 @@ use winnow::{
 
 use crate::serde::{
     de::{
-        Stream,
-        parser::{
-            self,
-            element::util::{id_parser, runtime_class_parser},
+        Stream, parser::{
+            self, element::util::{count_parser, id_parser, runtime_class_parser},
         },
-    },
-    raw::element::{Element, kind::ElementKind},
+    }, raw::element::{Element, kind::ElementKind},
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
@@ -110,5 +107,6 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
 
     let id = id_parser.parse_next(&mut input)?;
     let class = runtime_class_parser.parse_next(&mut input)?;
+    let field_count = count_parser.parse_next(&mut input)?;
     todo!()
 }

@@ -1,6 +1,6 @@
 use winnow::{
     Parser,
-    binary::{le_u32, u8},
+    binary::{le_i32, le_u32, u8},
     error::{ContextError, FromExternalError, ParserError},
     token::take,
 };
@@ -36,6 +36,15 @@ pub(crate) fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> 
         },
         "Runtime object class. LEB128 encoded C# type full name.",
     )
+}
+
+pub(crate) fn count_parser(input: &mut Stream) -> winnow::Result<usize> {
+    let count = le_i32.parse_next(input)?;
+    if count < 0 {
+        Err(ContextError::from_input(input))
+    } else {
+        Ok(count as usize)
+    }
 }
 
 fn leb128_string_parser<'b>(input: &mut Stream<'b>) -> winnow::Result<&'b str> {
