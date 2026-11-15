@@ -187,7 +187,7 @@ impl RuntimeClass {
         Self::KeyValuePair,
     ];
 
-    fn full_name(&self) -> Leb128Str {
+    fn full_name(&self) -> Leb128Str<'static> {
         match self {
             Self::Dictinoary => Leb128Str::from(
                 "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]",
