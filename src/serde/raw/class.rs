@@ -163,22 +163,22 @@ pub(crate) enum RuntimeClass {
     #[strum(to_string = "Dictionary<string, object>")]
     Dictinoary,
 
-    // TODO: #[strum(to_string = "?")]
-    GenericEqualityComparer,
+    #[strum(to_string = "GenericEqualityComparer<string>")]
+    StringGenericEqualityComparer,
 
-    // TODO: #[strum(to_string = "?")]
-    KeyValuePairArray,
+    #[strum(to_string = "KeyValuePair<string, object>")]
+    StringObjectKeyValuePair,
 
-    // TODO: #[strum(to_string = "?")]
-    KeyValuePair,
+    #[strum(to_string = "KeyValuePair<string, object>[]")]
+    StringObjectKeyValuePairArray,
 }
 
 impl RuntimeClass {
     const ALL: [Self; 4] = [
         Self::Dictinoary,
-        Self::GenericEqualityComparer,
-        Self::KeyValuePairArray,
-        Self::KeyValuePair,
+        Self::StringGenericEqualityComparer,
+        Self::StringObjectKeyValuePairArray,
+        Self::StringObjectKeyValuePair,
     ];
 
     fn full_name(&self) -> Leb128Str<'static> {
@@ -186,14 +186,14 @@ impl RuntimeClass {
             Self::Dictinoary => {
                 "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
             }
-            Self::GenericEqualityComparer => {
+            Self::StringGenericEqualityComparer => {
                 "System.Collections.Generic.GenericEqualityComparer`1[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
             }
-            Self::KeyValuePairArray => {
-                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][]"
-            }
-            Self::KeyValuePair => {
+            Self::StringObjectKeyValuePair => {
                 "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"
+            }
+            Self::StringObjectKeyValuePairArray => {
+                "System.Collections.Generic.KeyValuePair`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][]"
             }
         };
         Leb128Str::from(name)
