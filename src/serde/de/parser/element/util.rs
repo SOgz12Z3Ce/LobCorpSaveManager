@@ -72,7 +72,6 @@ fn leb128_string_parser<'b>(input: &mut Stream<'b>) -> winnow::Result<&'b str> {
         return Err(ContextError::from_input(input));
     }
 
-    let capacity = usize::try_from(length).expect("length has been verified to be > 0 above");
-    let content = take(capacity).parse_next(input)?;
+    let content = take(length as usize).parse_next(input)?;
     str::from_utf8(content).map_err(|e| ContextError::from_external_error(input, e))
 }
