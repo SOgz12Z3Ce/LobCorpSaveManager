@@ -97,9 +97,7 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
         },
         Class::Runtime(runtime_class) => match runtime_class {
             RuntimeClass::Dictinoary => todo!(),
-            RuntimeClass::StringGenericEqualityComparer => {
-                runtime_field_parser
-            }
+            RuntimeClass::StringGenericEqualityComparer => runtime_field_parser,
             RuntimeClass::StringObjectKeyValuePair => todo!(),
             RuntimeClass::StringObjectKeyValuePairArray => todo!(),
         },
@@ -107,7 +105,9 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
 }
 
 fn runtime_field_parser(input: &mut Stream) -> winnow::Result<Value> {
-    let kind = field_element_kind_parser.parse_next(input)?;
+    let mut input = parser::prologue(input, "field_value");
+
+    let kind = field_element_kind_parser.parse_next(&mut input)?;
     match kind {
         ElementKind::Header => {
             unimplemented!("this runtime field kind was considered to be non-existent in saves")
