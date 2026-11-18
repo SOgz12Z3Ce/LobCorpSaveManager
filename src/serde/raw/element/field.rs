@@ -1,26 +1,11 @@
-use crate::serde::raw::{field::FieldKind, leb128_str::Leb128String, ty::class::Class};
+use crate::serde::raw::element::FieldMeta;
 
 #[allow(unused)] // TODO: It will be used someday.
-#[derive(Debug, Clone)]
-pub(crate) struct FieldMeta {
-    count: usize,
-    names: Vec<Leb128String>,
-    kinds: Vec<FieldKind>,
-    classes: Vec<Class>,
-}
+#[derive(Debug)]
+pub(crate) struct FieldInfo(Vec<FieldMeta>);
 
-impl FieldMeta {
-    pub(crate) fn new(
-        count: usize,
-        names: Vec<Leb128String>,
-        kinds: Vec<FieldKind>,
-        classes: Vec<Class>,
-    ) -> Self {
-        Self {
-            count,
-            names,
-            kinds,
-            classes,
-        }
+impl FieldInfo {
+    pub(crate) fn new(field_metas: Vec<FieldMeta>) -> Self {
+        Self(field_metas)
     }
 }

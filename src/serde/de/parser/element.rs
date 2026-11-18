@@ -19,7 +19,7 @@ use crate::serde::{
         },
     },
     raw::{
-        element::{Element, field::FieldMeta, kind::ElementKind},
+        element::{Element, field::FieldInfo, kind::ElementKind},
         field::FieldKind,
         leb128_str::Leb128Str,
         ty::{class::Class, value::Value},
@@ -101,30 +101,27 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
 
     let id = id_parser.parse_next(&mut input)?;
     let class = runtime_object_class_parser.parse_next(&mut input)?;
-    let field_count = usize::from(field_count_parser.parse_next(&mut input)?);
-    let field_names: Vec<Leb128Str> =
-        repeat(field_count, field_name_parser).parse_next(&mut input)?;
-    let field_kinds: Vec<FieldKind> =
-        repeat(field_count, field_kind_parser).parse_next(&mut input)?;
-    let field_classes: Vec<Class> = field_kinds
+
+    // Fields
+    let count = usize::from(field_count_parser.parse_next(&mut input)?);
+    let names: Vec<Leb128Str> = repeat(count, field_name_parser).parse_next(&mut input)?;
+    let kinds: Vec<FieldKind> = repeat(count, field_kind_parser).parse_next(&mut input)?;
+    let classes: Vec<Class> = kinds
         .iter()
         .map(|kind| class_parser_of(*kind).parse_next(&mut input))
         .collect::<Result<_, _>>()?;
-    let field_values: Vec<Value> = field_classes
+    let values: Vec<Value> = classes
         .iter()
         .map(|class| value_parser_of(*class).parse_next(&mut input))
         .collect::<Result<_, _>>()?;
 
-    let field_meta = FieldMeta::new(
-        field_count,
-        field_names
-            .into_iter()
-            .map(|s| s.to_string().into())
-            .collect(),
-        field_kinds,
-        field_classes,
+    let field_info = FieldInfo::new(
+        count,
+        names.into_iter().map(|s| s.to_string().into()).collect(),
+        kinds,
+        classes,
     );
-    if let Some(_) = input.state.metadata.insert(id, field_meta.clone()) {
+    if let Some(_) = input.state.metadata.insert(id, field_info.clone()) {
         let input: &mut Stream = &mut input;
         return Err(ContextError::from_input(input));
     }
@@ -132,7 +129,7 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
     Ok(Element::RuntimeObject {
         id,
         class,
-        field_meta,
-        field_values,
+        field_info,
+        field_values: values,
     })
 }

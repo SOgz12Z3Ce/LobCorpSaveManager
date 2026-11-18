@@ -1,6 +1,7 @@
 use crate::serde::raw::{
-    element::field::FieldMeta,
+    field::FieldKind,
     id::Id,
+    leb128_str::Leb128String,
     ty::{class::Class, value::Value},
 };
 
@@ -17,8 +18,7 @@ pub(crate) enum Element {
     RuntimeObject {
         id: Id,
         class: Class,
-        field_meta: FieldMeta,
-        field_values: Vec<Value>,
+        fields: Vec<Field>,
     },
     // ExternalObject,
     // String,
@@ -38,4 +38,29 @@ pub(crate) enum Element {
     // Unknown5,
     // MethodCall,
     // MethodResponse,
+}
+
+#[derive(Debug)]
+pub(crate) struct FieldMeta {
+    name: Leb128String,
+    kind: FieldKind,
+    class: Class,
+}
+
+impl FieldMeta {
+    pub(crate) fn new(name: Leb128String, kind: FieldKind, class: Class) -> Self {
+        Self { name, kind, class }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct Field {
+    meta: FieldMeta,
+    value: Value,
+}
+
+impl Field {
+    pub(crate) fn new(meta: FieldMeta, value: Value) -> Self {
+        Self { meta, value }
+    }
 }

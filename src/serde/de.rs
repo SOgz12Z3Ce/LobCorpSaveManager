@@ -12,7 +12,7 @@ use crate::{
     error::Error,
     serde::{
         de::parser::parser,
-        raw::{File, element::field::FieldMeta, id::Id},
+        raw::{File, element::field::FieldInfo, id::Id},
     },
 };
 
@@ -20,7 +20,7 @@ use crate::{
 struct State {
     #[cfg(feature = "log")]
     log_engine: LogEngine,
-    metadata: HashMap<Id, FieldMeta>,
+    metadata: HashMap<Id, FieldInfo>,
 }
 
 type Stream<'a> = Stateful<&'a [u8], State>;
