@@ -98,7 +98,7 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
         Class::Runtime(runtime_class) => match runtime_class {
             RuntimeClass::Dictinoary => todo!(),
             RuntimeClass::StringGenericEqualityComparer => {
-                runtime_object_runtime_field_value_parser
+                runtime_field_parser
             }
             RuntimeClass::StringObjectKeyValuePair => todo!(),
             RuntimeClass::StringObjectKeyValuePairArray => todo!(),
@@ -106,7 +106,7 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
     }
 }
 
-fn runtime_object_runtime_field_value_parser(input: &mut Stream) -> winnow::Result<Value> {
+fn runtime_field_parser(input: &mut Stream) -> winnow::Result<Value> {
     let kind = field_element_kind_parser.parse_next(input)?;
     match kind {
         ElementKind::Header => {
