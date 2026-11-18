@@ -14,7 +14,7 @@ use crate::serde::{
         id::Id,
         leb128_str::Leb128Str,
         ty::{
-            class::{Class, PrimitiveClass, RuntimeClass},
+            class::{Class, PrimitiveClass},
             value::Value,
         },
     },
