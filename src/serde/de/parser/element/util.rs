@@ -7,7 +7,17 @@ use winnow::{
 
 use crate::serde::{
     de::{Stream, parser},
-    raw::{class::Class, count::Count, field::FieldKind, id::Id, leb128_str::Leb128Str},
+    raw::{
+        count::Count,
+        element::kind::ElementKind,
+        field::FieldKind,
+        id::Id,
+        leb128_str::Leb128Str,
+        ty::{
+            class::{Class, PrimitiveClass, RuntimeClass},
+            value::Value,
+        },
+    },
 };
 
 pub(crate) fn id_parser(input: &mut Stream) -> winnow::Result<Id> {
@@ -64,6 +74,36 @@ pub(crate) fn class_parser_of<'b>(kind: FieldKind) -> impl Parser<Stream<'b>, Cl
     }
 }
 
+pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value, ContextError> {
+    match class {
+        Class::Primitive(primitive_class) => match primitive_class {
+            PrimitiveClass::Bool => todo!(),
+            PrimitiveClass::Byte => todo!(),
+            PrimitiveClass::Char => todo!(),
+            PrimitiveClass::Decimal => todo!(),
+            PrimitiveClass::Double => todo!(),
+            PrimitiveClass::Short => todo!(),
+            PrimitiveClass::Int => |input: &mut Stream<'b>| Ok(le_i32.parse_next(input)?.into()),
+            PrimitiveClass::Long => todo!(),
+            PrimitiveClass::SByte => todo!(),
+            PrimitiveClass::Float => todo!(),
+            PrimitiveClass::TimeSpan => todo!(),
+            PrimitiveClass::DateTime => todo!(),
+            PrimitiveClass::UShort => todo!(),
+            PrimitiveClass::UInt => todo!(),
+            PrimitiveClass::ULong => todo!(),
+            PrimitiveClass::Null => todo!(),
+            PrimitiveClass::String => todo!(),
+        },
+        Class::Runtime(runtime_class) => match runtime_class {
+            RuntimeClass::Dictinoary => todo!(),
+            RuntimeClass::StringGenericEqualityComparer => todo!(),
+            RuntimeClass::StringObjectKeyValuePair => todo!(),
+            RuntimeClass::StringObjectKeyValuePairArray => todo!(),
+        },
+    }
+}
+
 macro_rules! wrapper {
     ($name:ident: $parser:ident -> $result:ty) => {
         macro_rules! $name {
@@ -82,16 +122,24 @@ macro_rules! wrapper {
     };
 }
 
-wrapper!(primitive_class_parser: primitive_class_parser -> Class);
+wrapper!(element_kind_wrapper: element_kind_parser -> ElementKind);
+wrapper!(primitive_class_wrapper: primitive_class_parser -> Class);
 wrapper!(runtime_class_wrapper: runtime_class_parser -> Class);
 wrapper!(count_wrapper: count_parser -> Count);
 wrapper!(leb128_str_wrapper: leb128_str_parser -> Leb128Str<'b>);
 
-primitive_class_parser!(field_primitive_class_parser("field_class": "Runtime object field class. This is a primitive class."));
+element_kind_wrapper!(leading_element_kind_parser("kind": "Element kind. Every element is leaded with this tag."));
+primitive_class_wrapper!(field_primitive_class_parser("field_class": "Runtime object field class. This is a primitive class."));
 runtime_class_wrapper!(runtime_object_class_parser("class": "Runtime object class. LEB128 encoded C# type full name."));
 runtime_class_wrapper!(field_runtime_class_parser("class": "Runtime object field class. This is a runtime class. LEB128 encoded C# type full name."));
 count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
 leb128_str_wrapper!(field_name_parser("field_name": "Runtime object field name. LEB128 encoded string."));
+
+fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
+    u8.parse_next(input)?
+        .try_into()
+        .map_err(|error| ContextError::from_external_error(input, error))
+}
 
 fn primitive_class_parser(input: &mut Stream) -> winnow::Result<Class> {
     let code = u8.parse_next(input)?;

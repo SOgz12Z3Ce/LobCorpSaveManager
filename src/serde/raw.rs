@@ -1,9 +1,9 @@
-pub(crate) mod class;
 pub(crate) mod count;
 pub(crate) mod element;
 pub(crate) mod field;
 pub(crate) mod id;
 pub(crate) mod leb128_str;
+pub(crate) mod ty;
 
 use std::fmt::Display;
 

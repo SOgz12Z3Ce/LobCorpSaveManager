@@ -1,11 +1,6 @@
 mod util;
 
-use winnow::{
-    Parser,
-    binary::u8,
-    combinator::repeat,
-    error::{ContextError, FromExternalError},
-};
+use winnow::{Parser, combinator::repeat};
 
 use crate::serde::{
     de::{
@@ -14,22 +9,23 @@ use crate::serde::{
             self,
             element::util::{
                 class_parser_of, field_count_parser, field_kind_parser, field_name_parser,
-                id_parser, runtime_object_class_parser,
+                id_parser, leading_element_kind_parser, runtime_object_class_parser,
+                value_parser_of,
             },
         },
     },
     raw::{
-        class::Class,
         element::{Element, kind::ElementKind},
         field::FieldKind,
         leb128_str::Leb128Str,
+        ty::{class::Class, value::Value},
     },
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
     let mut input = parser::prologue(input, "element");
 
-    match element_kind_parser.parse_next(&mut input)? {
+    match leading_element_kind_parser.parse_next(&mut input)? {
         ElementKind::Header => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
@@ -98,22 +94,6 @@ pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
     }
 }
 
-fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
-    let mut input = parser::prologue(input, "kind");
-
-    let kind = parser::explain(
-        &mut input,
-        move |input| {
-            u8.parse_next(input)?
-                .try_into()
-                .map_err(|error| ContextError::from_external_error(input, error))
-        },
-        "Element kind. Every element is leaded with this tag.",
-    )?;
-
-    Ok(kind)
-}
-
 fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
     let mut input = parser::prologue(input, "runtime_object");
 
@@ -127,6 +107,10 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
     let field_classes: Vec<Class> = field_kinds
         .iter()
         .map(|kind| class_parser_of(*kind).parse_next(&mut input))
+        .collect::<Result<_, _>>()?;
+    let field_value: Vec<Value> = field_classes
+        .iter()
+        .map(|class| value_parser_of(*class).parse_next(&mut input))
         .collect::<Result<_, _>>()?;
 
     todo!()
