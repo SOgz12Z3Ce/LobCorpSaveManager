@@ -23,9 +23,7 @@ use crate::serde::{
 };
 
 pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
-    let mut input = parser::prologue(input, "element");
-
-    match leading_element_kind_parser.parse_next(&mut input)? {
+    match leading_element_kind_parser.parse_next(input)? {
         ElementKind::Header => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
@@ -38,7 +36,7 @@ pub(crate) fn element_parser(input: &mut Stream) -> winnow::Result<Element> {
         ElementKind::UntypedExternalObject => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
-        ElementKind::RuntimeObject => runtime_object_parser.parse_next(&mut input),
+        ElementKind::RuntimeObject => runtime_object_parser.parse_next(input),
         ElementKind::ExternalObject => {
             unimplemented!("this element kind was considered to be non-existent in saves")
         }
