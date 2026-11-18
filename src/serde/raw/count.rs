@@ -10,7 +10,7 @@ impl TryFrom<i32> for Count {
     type Error = Error;
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
-        if value > 0 {
+        if value >= 0 {
             Ok(Self(value as usize))
         } else {
             Err(Self::Error::InvalidCount(value))
