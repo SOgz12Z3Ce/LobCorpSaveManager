@@ -95,12 +95,7 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
             PrimitiveClass::Null => todo!(),
             PrimitiveClass::String => todo!(),
         },
-        Class::Runtime(runtime_class) => match runtime_class {
-            RuntimeClass::Dictinoary => todo!(),
-            RuntimeClass::StringGenericEqualityComparer => runtime_field_parser,
-            RuntimeClass::StringObjectKeyValuePair => todo!(),
-            RuntimeClass::StringObjectKeyValuePairArray => todo!(),
-        },
+        Class::Runtime(_) => runtime_field_parser,
     }
 }
 
