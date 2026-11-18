@@ -83,7 +83,7 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
             PrimitiveClass::Decimal => todo!(),
             PrimitiveClass::Double => todo!(),
             PrimitiveClass::Short => todo!(),
-            PrimitiveClass::Int => |input: &mut Stream<'b>| Ok(le_i32.parse_next(input)?.into()),
+            PrimitiveClass::Int => int_field_parser,
             PrimitiveClass::Long => todo!(),
             PrimitiveClass::SByte => todo!(),
             PrimitiveClass::Float => todo!(),
@@ -97,10 +97,87 @@ pub(crate) fn value_parser_of<'b>(class: Class) -> impl Parser<Stream<'b>, Value
         },
         Class::Runtime(runtime_class) => match runtime_class {
             RuntimeClass::Dictinoary => todo!(),
-            RuntimeClass::StringGenericEqualityComparer => todo!(),
+            RuntimeClass::StringGenericEqualityComparer => {
+                runtime_object_runtime_field_value_parser
+            }
             RuntimeClass::StringObjectKeyValuePair => todo!(),
             RuntimeClass::StringObjectKeyValuePairArray => todo!(),
         },
+    }
+}
+
+fn runtime_object_runtime_field_value_parser(input: &mut Stream) -> winnow::Result<Value> {
+    let kind = field_element_kind_parser.parse_next(input)?;
+    match kind {
+        ElementKind::Header => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::RefTypeObject => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::UntypedRuntimeObject => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::UntypedExternalObject => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::RuntimeObject => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ExternalObject => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::String => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::GenericArray => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::BoxedPrimitiveTypeValue => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ObjectReference => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::NullValue => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::End => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::Assembly => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ArrayFiller8b => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ArrayFiller32b => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ArrayOfPrimitiveType => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ArrayOfObject => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::ArrayOfString => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::Method => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::Unknown4 => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::Unknown5 => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::MethodCall => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
+        ElementKind::MethodResponse => {
+            unimplemented!("this runtime field kind was considered to be non-existent in saves")
+        }
     }
 }
 
@@ -126,13 +203,16 @@ wrapper!(element_kind_wrapper: element_kind_parser -> ElementKind);
 wrapper!(primitive_class_wrapper: primitive_class_parser -> Class);
 wrapper!(runtime_class_wrapper: runtime_class_parser -> Class);
 wrapper!(count_wrapper: count_parser -> Count);
+wrapper!(int_wrapper: int_parser -> Value);
 wrapper!(leb128_str_wrapper: leb128_str_parser -> Leb128Str<'b>);
 
 element_kind_wrapper!(leading_element_kind_parser("kind": "Element kind. Every element is leaded with this tag."));
+element_kind_wrapper!(field_element_kind_parser("kind": "Runtime type kind of runtime object field."));
 primitive_class_wrapper!(field_primitive_class_parser("field_class": "Runtime object field class. This is a primitive class."));
 runtime_class_wrapper!(runtime_object_class_parser("class": "Runtime object class. LEB128 encoded C# type full name."));
 runtime_class_wrapper!(field_runtime_class_parser("class": "Runtime object field class. This is a runtime class. LEB128 encoded C# type full name."));
 count_wrapper!(field_count_parser("field_count": "Runtime object field count."));
+int_wrapper!(int_field_parser("field_value": "Runtime object int field value."));
 leb128_str_wrapper!(field_name_parser("field_name": "Runtime object field name. LEB128 encoded string."));
 
 fn element_kind_parser(input: &mut Stream) -> winnow::Result<ElementKind> {
@@ -149,6 +229,10 @@ fn primitive_class_parser(input: &mut Stream) -> winnow::Result<Class> {
 fn runtime_class_parser(input: &mut Stream) -> winnow::Result<Class> {
     let name = leb128_str_parser.parse_next(input)?;
     Class::runtime(name).map_err(|error| ContextError::from_external_error(input, error))
+}
+
+fn int_parser(input: &mut Stream) -> winnow::Result<Value> {
+    Ok(le_i32.parse_next(input)?.into())
 }
 
 fn count_parser(input: &mut Stream) -> winnow::Result<Count> {
