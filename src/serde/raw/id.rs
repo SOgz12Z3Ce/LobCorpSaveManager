@@ -8,7 +8,7 @@ use crate::serde::de::log::Log;
 // >= 1 (initial value of generator) and <= i32::MAX (or throw exception when
 // writing).
 #[allow(unused)] // TODO: It will be used someday.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct Id(u32);
 
 impl TryFrom<u32> for Id {
