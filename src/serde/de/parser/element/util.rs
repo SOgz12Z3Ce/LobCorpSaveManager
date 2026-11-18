@@ -136,9 +136,7 @@ fn runtime_field_parser(input: &mut Stream) -> winnow::Result<Value> {
         ElementKind::BoxedPrimitiveTypeValue => {
             unimplemented!("this runtime field kind was considered to be non-existent in saves")
         }
-        ElementKind::ObjectReference => {
-            unimplemented!("this runtime field kind was considered to be non-existent in saves")
-        }
+        ElementKind::ObjectReference => id_parser.parse_next(&mut input).map(Into::into),
         ElementKind::NullValue => {
             unimplemented!("this runtime field kind was considered to be non-existent in saves")
         }
