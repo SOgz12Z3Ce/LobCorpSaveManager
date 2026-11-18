@@ -1,6 +1,10 @@
 mod util;
 
-use winnow::{Parser, combinator::repeat};
+use winnow::{
+    Parser,
+    combinator::repeat,
+    error::{ContextError, ParserError},
+};
 
 use crate::serde::{
     de::{
@@ -15,7 +19,7 @@ use crate::serde::{
         },
     },
     raw::{
-        element::{Element, kind::ElementKind},
+        element::{Element, field::FieldMeta, kind::ElementKind},
         field::FieldKind,
         leb128_str::Leb128Str,
         ty::{class::Class, value::Value},
@@ -106,10 +110,29 @@ fn runtime_object_parser(input: &mut Stream) -> winnow::Result<Element> {
         .iter()
         .map(|kind| class_parser_of(*kind).parse_next(&mut input))
         .collect::<Result<_, _>>()?;
-    let field_value: Vec<Value> = field_classes
+    let field_values: Vec<Value> = field_classes
         .iter()
         .map(|class| value_parser_of(*class).parse_next(&mut input))
         .collect::<Result<_, _>>()?;
 
-    todo!()
+    let field_meta = FieldMeta::new(
+        field_count,
+        field_names
+            .into_iter()
+            .map(|s| s.to_string().into())
+            .collect(),
+        field_kinds,
+        field_classes,
+    );
+    if let Some(_) = input.state.metadata.insert(id, field_meta.clone()) {
+        let input: &mut Stream = &mut input;
+        return Err(ContextError::from_input(input));
+    }
+
+    Ok(Element::RuntimeObject {
+        id,
+        class,
+        field_meta,
+        field_values,
+    })
 }

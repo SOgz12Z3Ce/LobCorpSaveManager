@@ -2,19 +2,25 @@
 pub(crate) mod log;
 mod parser;
 
+use std::collections::HashMap;
+
 use winnow::{Parser, Stateful, token::rest};
 
 #[cfg(feature = "log")]
 use crate::serde::de::log::LogEngine;
 use crate::{
     error::Error,
-    serde::{de::parser::parser, raw::File},
+    serde::{
+        de::parser::parser,
+        raw::{File, element::field::FieldMeta, id::Id},
+    },
 };
 
 #[derive(Debug, Default)]
 struct State {
     #[cfg(feature = "log")]
     log_engine: LogEngine,
+    metadata: HashMap<Id, FieldMeta>,
 }
 
 type Stream<'a> = Stateful<&'a [u8], State>;

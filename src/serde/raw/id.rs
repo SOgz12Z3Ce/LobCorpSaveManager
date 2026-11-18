@@ -7,8 +7,7 @@ use crate::serde::de::log::Log;
 // C# will throw an exception when the casting overflow. So ID should be
 // >= 1 (initial value of generator) and <= i32::MAX (or throw exception when
 // writing).
-#[allow(unused)] // TODO: It will be used someday.
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct Id(u32);
 
 impl TryFrom<u32> for Id {

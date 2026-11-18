@@ -33,7 +33,7 @@ impl<'a> Log for Leb128Str<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Leb128String(String);
 
 impl From<String> for Leb128String {
